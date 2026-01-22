@@ -1,0 +1,201 @@
+index,instruction
+0,"As a digit, report the number of objects identified in the sentence."
+1,Count the objects in the sentence and show the total as a digit.
+2,Determine how many objects are listed and output the number in digit form.
+3,Identify all objects mentioned and return their count as a digit.
+4,"Analyze the sentence to compute the object count, expressed numerically."
+5,Please count the objects and print the result as a digit.
+6,Figure out how many objects there are and write the number as a digit.
+7,Go through the sentence and give me the object count as a digit.
+8,How many objects are mentioned? Answer using a digit.
+9,Tally the objects in the sentence and respond with a digit.
+10,"From the sentence, extract the number of objects and present it as a digit."
+11,Count what’s listed and output a digit showing how many.
+12,Return the total object count in digit form.
+13,Compute the quantity of objects and express it numerically.
+14,Assess the sentence and provide a digit representing the object count.
+15,Scan the sentence for objects and report the count as a digit.
+16,"Please identify and count the objects, then print a digit."
+17,State the number of objects using a digit.
+18,Determine the object total and present it in numeric form.
+19,Count the objects that appear and answer with a digit.
+20,"Using a digit, indicate how many objects are listed."
+21,Extract object mentions and convert their count into a digit.
+22,"Give the object count, written as a digit."
+23,Find the number of objects and show it numerically.
+24,Count the items mentioned and output the result as a digit.
+25,Provide a digit that reflects the object count.
+26,"After counting the objects, respond with a digit."
+27,Identify the total number of objects and output it numerically.
+28,Count all referenced objects and return the digit.
+29,"Count how many items I have and return the answer as a number."
+30,Figure out the object quantity and write it as a digit.
+31,How many objects are there? Respond in digit form.
+32,Count the objects and express the answer numerically.
+33,Review the sentence and give the object total as a digit.
+34,Produce a digit corresponding to the number of objects.
+35,Determine object quantity and display it as a digit.
+36,Count the listed objects and provide the numeric answer.
+37,Convert the object count into a digit.
+38,Return a digit that shows how many objects appear.
+39,Assess object mentions and output their count numerically.
+40,Calculate the total objects and print a digit.
+41,"State, in digit form, the number of objects present."
+42,Count the objects from the sentence and respond with a digit.
+43,Analyze and digitize the object count.
+44,Provide the object total using a digit.
+45,Find how many objects are named and output a digit.
+46,Count the objects and give the result in numeric form.
+47,Summarize the object count as a digit.
+48,Return the numeric value of the object count.
+49,Identify object mentions and report their number as a digit.
+50,Count everything listed and print the digit.
+51,Express the object quantity using digits.
+52,Determine the number of objects and show it numerically.
+53,Scan for objects and return the count as a digit.
+54,Give a digit representing the total objects.
+55,Count the objects present and answer numerically.
+56,Output the number of objects in digit form.
+57,Please tally the objects and give me a digit.
+58,How many objects do you see? Use a digit to answer.
+59,Count the mentioned objects and provide a digit.
+60,Report the object count in numeric form.
+61,Review the sentence and compute the object total as a digit.
+62,Return the digit equivalent of the object count.
+63,Assess the sentence and state the object number as a digit.
+64,Count objects and present the total numerically.
+65,Indicate the number of objects using a digit.
+66,"Extract and count objects, then output a digit."
+67,Compute the object count and display it as a digit.
+68,State the object total in digit format.
+69,Find and count the objects; respond with a digit.
+70,Provide a numerical answer for the object count.
+71,Count all objects referenced and print the digit.
+72,Translate the object count into numeric form.
+73,Give the total number of objects as a digit.
+74,Determine object frequency and express it as a digit.
+75,Analyze the sentence for objects and digitize the count.
+76,Count the objects mentioned and reply with a digit.
+77,Show the object count using digits.
+78,How many objects are listed? Answer numerically.
+79,Calculate object quantity and return a digit.
+80,"Identify and count objects, outputting a digit."
+81,Respond with a digit that reflects the object count.
+82,Count the objects and show the number as a digit.
+83,Provide the digit form of the object total.
+84,Assess object listings and print the count as a digit.
+85,"Give me the object count, expressed as a digit."
+86,Count what’s there and answer with a digit.
+87,Output a digit indicating how many objects appear.
+88,Find the object count and represent it numerically.
+89,Determine the quantity of objects and print a digit.
+90,Scan the sentence and give the object count as a digit.
+91,Count all listed objects and respond numerically.
+92,Return the digit that equals the object total.
+93,Compute and output the object count in digit form.
+94,Identify the number of objects and show it as a digit.
+95,Provide a digit-based answer for the object count.
+96,Count the objects found and print the number as a digit.
+97,Assess and report the object count numerically.
+98,How many objects are mentioned? Reply with a digit.
+99,Convert the total object count into digits.
+100,Determine object count from the sentence and output a digit.
+101,Count object mentions and present the total numerically.
+102,State the numeric value of the object count.
+103,"Review and count objects, then print a digit."
+104,Return a numeric digit showing the object count.
+105,Identify objects and give their count as a digit.
+106,Count everything listed and answer numerically.
+107,Express the number of objects in digit form.
+108,Provide the object count using digits.
+109,Calculate the number of objects and respond with a digit.
+110,Count the objects included and output the digit.
+111,Report how many objects there are as a digit.
+112,Find the object total and show it numerically.
+113,Determine and digitize the object count.
+114,Count the objects present and return a digit.
+115,Output the numeric representation of the object count.
+116,Assess the sentence and supply a digit for the object total.
+117,State the count of objects using digits.
+118,Count object entries and give the digit result.
+119,Compute object quantity and express it as a digit.
+120,Provide a digit that shows the object count.
+121,"Review the sentence, count objects, and output a digit."
+122,Indicate numerically how many objects are listed.
+123,Count the objects and deliver the result as a digit.
+124,"Expressed as a digit, how many items do I have?"
+125,Translate object quantity into digit form.
+126,Count all objects and provide the answer numerically.
+127,Determine the object count and print it as a digit.
+128,Respond with a digit indicating the total objects.
+129,"Identify and count objects, then answer with a digit."
+130,Output a digit corresponding to object quantity.
+131,Count the objects named and present the number as a digit.
+132,Report the object count in digits.
+133,Assess the list of objects and output the digit.
+134,Calculate how many objects appear and show it numerically.
+135,Provide the digit version of the object count.
+136,Count object mentions and respond in digit form.
+137,Find the total objects and print a digit.
+138,State the object quantity numerically.
+139,Review the sentence for objects and digitize the count.
+140,Count the objects and show the result as a digit.
+141,Give a numeric response for the object count.
+142,Determine object quantity and answer with a digit.
+143,Extract the object count and output it numerically.
+144,Count all mentioned objects and show the digit.
+145,Provide the object total as a digit.
+146,"Assess and count the objects, then return a digit."
+147,How many objects are present? Use a digit to answer.
+148,Compute the object number and express it as a digit.
+149,Count objects and output the total in numeric form.
+150,Identify the object count and give it as a digit.
+151,Return the numeric object total.
+152,Count the objects listed and respond with digits.
+153,State the digit that represents the object count.
+154,Determine the number of objects and output digits.
+155,"Find and count objects, then print the digit."
+156,Calculate object count and provide it numerically.
+157,Express object quantity in digit format.
+158,Count the objects and report the number as a digit.
+159,Give the digit equivalent of the object total.
+160,Assess object mentions and return the count as a digit.
+161,Output the object count using numeric digits.
+162,Count all objects present and give a digit.
+163,Determine object total and express it numerically.
+164,Provide a digit-based count of the objects.
+165,"Scan the sentence, count objects, and answer with a digit."
+166,Identify objects and output their count as a digit.
+167,Return the number of objects in digit form.
+168,Count object references and show the digit.
+169,Compute the total objects and respond numerically.
+170,State the object count as a digit.
+171,Count everything mentioned and provide a digit.
+172,Give the numeric value for the object count.
+173,Determine and report object quantity using digits.
+174,Count the objects and express the total as a digit.
+175,Output the digit that matches the object count.
+176,Assess the sentence to find the object number and digitize it.
+177,Identify how many objects there are and answer numerically.
+178,Count object mentions and print the digit.
+179,Provide the object count in numeric format.
+180,Calculate the object total and show it as a digit.
+181,Review the sentence and state the object count as a digit.
+182,Count objects appearing and return a digit.
+183,Express the total number of objects using digits.
+184,Determine object count and provide it numerically.
+185,Give a digit showing the number of objects.
+186,Count all objects and respond with a numeric digit.
+187,Output the digit representation of the object count.
+188,"Assess and tally objects, then give a digit."
+189,Find the number of objects and answer in digit form.
+190,Count the objects and provide a numerical answer.
+191,Return the digit that represents object quantity.
+192,Compute the object count from the sentence and digitize it.
+193,Identify object quantity and show it as a digit.
+194,Count the objects listed and output digits.
+195,Provide the numeric count of objects.
+196,Assess the sentence and output the object count as a digit.
+197,Count the objects and show the number numerically.
+198,Give the object total in digit form.
+199,Determine how many objects are mentioned and respond with a digit.

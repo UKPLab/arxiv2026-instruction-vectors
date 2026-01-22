@@ -1,0 +1,201 @@
+index,instruction
+0,Given a metaphorical sentence decide Y or N depending on whether the second sentence interprets it correctly.
+1,Determine whether the second sentence is the correct interpretation of a metaphorical sentence and respond Y or N.
+2,Your task is to mark Y or N based on whether the second sentence accurately explains the metaphor.
+3,Read the metaphorical sentence and choose Y or N to indicate if the interpretation is correct.
+4,Decide Y or N by checking whether the second sentence matches the metaphorical meaning.
+5,Assess if the interpretation sentence is accurate for the metaphor and output Y or N.
+6,For each metaphorical statement select Y or N to show if the interpretation is valid.
+7,Judge whether the second sentence correctly interprets the metaphor and mark Y or N.
+8,Use Y or N to indicate whether the interpretation sentence explains the metaphor properly.
+9,Determine the correctness of the interpretation by answering Y or N.
+10,Check if the second sentence captures the metaphorical meaning and respond with Y or N.
+11,Indicate Y or N depending on whether the interpretation aligns with the metaphor.
+12,Evaluate the interpretation sentence and assign Y or N based on its accuracy.
+13,Decide whether the metaphor is correctly interpreted and mark Y or N.
+14,Select Y or N to show if the second sentence is a correct interpretation.
+15,Use Y or N after deciding whether the interpretation fits the metaphorical sentence.
+16,Determine interpretation accuracy and respond Y or N accordingly.
+17,Assess the metaphor–interpretation pair and choose Y or N.
+18,Judge the second sentence and indicate Y or N if it matches the metaphor.
+19,Answer Y or N based on whether the interpretation is correct.
+20,Check the interpretation against the metaphor and mark Y or N.
+21,Indicate with Y or N whether the second sentence explains the metaphor.
+22,Choose Y or N depending on the correctness of the interpretation.
+23,Decide on Y or N after evaluating the metaphorical meaning.
+24,Evaluate if the interpretation sentence is accurate and respond Y or N.
+25,Use Y or N to signal whether the metaphor is properly interpreted.
+26,Determine correctness of interpretation and assign Y or N.
+27,Mark Y or N based on whether the second sentence fits the metaphor.
+28,Select Y or N to indicate interpretation accuracy.
+29,Judge interpretation quality and respond Y or N.
+30,Check metaphor comprehension and choose Y or N.
+31,Indicate Y or N if the interpretation matches the metaphorical idea.
+32,Answer with Y or N after reviewing the interpretation.
+33,Decide Y or N by comparing the metaphor and its explanation.
+34,Use Y or N to reflect whether the interpretation is correct.
+35,Mark Y or N according to interpretation validity.
+36,Assess metaphor understanding and select Y or N.
+37,Judge if the second sentence is accurate and mark Y or N.
+38,Respond Y or N depending on interpretation correctness.
+39,Determine whether the metaphor is well explained and answer Y or N.
+40,Choose Y or N based on alignment between metaphor and interpretation.
+41,Indicate Y or N to show whether the explanation is correct.
+42,Check interpretation accuracy and respond with Y or N.
+43,Evaluate the second sentence and mark Y or N.
+44,Decide Y or N after analyzing the metaphorical meaning.
+45,Answer Y or N if the interpretation sentence is appropriate.
+46,Select Y or N based on metaphor interpretation accuracy.
+47,Judge whether the metaphor is correctly understood and mark Y or N.
+48,Use Y or N to indicate correctness of interpretation.
+49,Determine interpretation validity and respond Y or N.
+50,Mark Y or N after reviewing the metaphorical explanation.
+51,Choose Y or N depending on whether the interpretation is correct.
+52,Assess the explanation and assign Y or N.
+53,Judge the interpretation and indicate Y or N.
+54,Answer Y or N after comparing the two sentences.
+55,Use Y or N to confirm metaphor interpretation accuracy.
+56,Decide on Y or N by evaluating the metaphor.
+57,Mark Y or N if the second sentence explains the metaphor well.
+58,Check explanation correctness and respond Y or N.
+59,Choose Y or N based on metaphorical alignment.
+60,Indicate Y or N depending on interpretation quality.
+61,Determine if the interpretation is right and answer Y or N.
+62,Judge whether the second sentence captures the metaphor and mark Y or N.
+63,"Decide, using Y or N, whether the second sentence correctly unpacks the metaphor."
+64,Use Y or N to show if the interpretation is accurate.
+65,Decide Y or N after evaluating metaphor comprehension.
+66,Respond with Y or N depending on interpretation correctness.
+67,Check whether the explanation fits and mark Y or N.
+68,Evaluate the interpretation sentence and assign Y or N.
+69,Choose Y or N after reviewing metaphor meaning.
+70,Judge how accurately the second sentence interprets the first and indicate Y or N.
+71,Mark Y or N based on whether the metaphor is properly explained.
+72,Decide whether the interpretation works and answer Y or N.
+73,Assess correctness of interpretation and choose Y or N.
+74,Use Y or N to indicate metaphor understanding.
+75,Judge the second sentence and respond Y or N.
+76,Determine explanation accuracy of the second sentence and mark Y or N.
+77,Select Y or N after checking metaphor interpretation.
+78,Answer Y or N if the interpretation matches the metaphor.
+79,Indicate Y or N depending on explanation validity.
+80,Check the accuracy of the metaphor explanation and choose Y or N.
+81,Decide on Y or N after comparing meaning.
+82,Use Y or N to reflect interpretation correctness.
+83,Judge metaphor explanation and mark Y or N.
+84,Respond Y or N based on whether the second sentence accurately interprets the first.
+85,Determine whether the explanation is correct and choose Y or N.
+86,Assess metaphor comprehension and answer Y or N.
+87,Mark Y or N if the interpretation aligns with the metaphor.
+88,Read the following two sentences and say if the second one is the correct interpretation of the first. Print Y for yes and N for no.
+89,Decide Y or N after evaluating the metaphorical sentence.
+90,Judge interpretation validity and respond Y or N.
+91,Indicate Y or N depending on whether the metaphor is explained.
+92,Check the explanation and mark Y or N to indicate whether it is correct.
+93,Use Y or N to indicate correct interpretation.
+94,Decide whether the second sentence fits and answer Y or N.
+95,Your judgment should be Y or N depending on whether the interpretation makes sense of the metaphor.
+96,Judge whether the metaphor is interpreted correctly and mark Y or N.
+97,Respond with Y or N after evaluating the explanation.
+98,Choose Y or N if the interpretation is accurate.
+99,Determine correctness of interpretation and indicate Y or N.
+100,Mark Y or N based on metaphor explanation accuracy.
+101,Decide on Y or N after reviewing both sentences.
+102,Use Y or N to confirm interpretation correctness.
+103,Judge alignment of the two sentences' meanings and respond Y or N.
+104,Assess metaphor explanation and mark Y or N.
+105,Choose Y or N depending on whether interpretation is valid.
+106,Decide Y or N after checking metaphor meaning.
+107,Judge the relationship between the metaphor and its explanation and indicate Y or N.
+108,Respond Y or N based on interpretation quality.
+109,Judge whether the second sentence explains the metaphor and mark Y or N.
+110,Respond with Y or N if the second sentence offers a plausible reading of the metaphor.
+111,Use Y or N to indicate interpretation validity.
+112,Decide whether the explanation is right and answer Y or N.
+113,Mark Y or N after evaluating metaphor understanding.
+114,Judge explanation accuracy of the metaphor and choose Y or N.
+115,Respond with Y or N if the interpretation matches.
+116,Determine whether the metaphor is properly explained and mark Y or N.
+117,Mark Y or N to reflect whether the metaphor has been properly understood.
+118,Read the following two sentences. Is the second one the correct interpretation of the first? Print Y for yes and N for no.
+119,Decide Y or N after reviewing the interpretation.
+120,Indicate Y or N depending on how accurately the second sentence interprets the metaphorical meaning of the first.
+121,Judge the interpretation sentence and respond Y or N.
+122,Mark Y or N if the metaphor is understood correctly.
+123,Assess metaphor explanation and choose Y or N.
+124,Decide whether the interpretation is accurate and answer Y or N.
+125,Use Y or N to indicate correctness of explanation.
+126,Judge interpretation alignment and mark Y or N.
+127,Respond Y or N after evaluating metaphor meaning.
+128,Choose Y or N to reflect interpretation validity.
+129,Mark Y or N based on whether the second sentence captures the metaphor’s essence.
+130,Assess whether the metaphor is correctly interpreted and answer Y or N.
+131,Mark Y or N based on explanation accuracy.
+132,Judge the second sentence and choose Y or N.
+133,Decide Y or N after analyzing metaphor comprehension.
+134,In the following sentence pair one sentence is metaphorical and the second one isn't. Print Y for yes and N for no if the second one is a correct interpretation of the first.
+135,Respond with Y or N depending on explanation quality.
+136,Indicate Y or N depending on whether the explanation captures the metaphor’s underlying meaning.
+137,Judge whether the metaphor is explained well and answer Y or N.
+138,Choose Y or N after checking the interpretation.
+139,For a given metaphorical sentence print Y for yes and N for no if the second one correctly translates the meaning of the first.
+140,Indicate Y or N if the interpretation is correct.
+141,Assess metaphor understanding and mark Y or N.
+142,Decide whether the explanation fits and answer Y or N.
+143,Use Y or N to indicate metaphor interpretation accuracy.
+144,Judge explanation validity and choose Y or N.
+145,Respond Y or N after reviewing the metaphorical meaning.
+146,Determine if the interpretation is right and mark Y or N.
+147,Assess correctness of explanation and answer Y or N.
+148,Choose Y or N based on interpretation accuracy.
+149,Judge the understanding of the metaphor and respond Y or N.
+150,Indicate Y or N depending on correctness of interpretation.
+151,Decide Y or N after evaluating explanation.
+152,Mark Y or N to reflect whether the metaphor is meaningfully explained.
+153,Assess metaphor comprehension and choose Y or N.
+154,Judge explanation correctness and mark Y or N.
+155,Respond with Y or N if the interpretation is valid.
+156,Determine whether the metaphor is well interpreted and answer Y or N.
+157,Answer Y for yes and N for no: Does the second sentence in the following pair correctly translate the meaning of the first?
+158,Answer Y (yes) or N (no): For a given metaphorical sentence does the sentence after it correctly interpret its meaning?
+159,Decide Y or N after checking metaphor meaning.
+160,Choose Y or N to indicate whether the metaphor’s sense is maintained.
+161,Judge the interpretation sentence and answer Y or N.
+162,Decide on Y or N after weighing the interpretation against the metaphor.
+163,Respond Y or N depending on interpretation accuracy.
+164,Assess metaphor explanation and mark Y or N.
+165,Decide whether the interpretation works and answer Y or N.
+166,Choose Y or N based on metaphor explanation correctness.
+167,Judge interpretation alignment and respond Y or N.
+168,Use Y or N to indicate metaphor understanding.
+169,Assess whether the two sentences correspond in meaning and mark Y or N.
+170,"For a given metaphorical sentence, does the sentence after it correctly interpret its meaning? Answer Y for yes and N for no."
+171,Respond with Y or N if interpretation is accurate.
+172,Judge metaphor explanation and choose Y or N.
+173,Determine interpretation validity and answer Y or N.
+174,Use Y or N to show explanation correctness.
+175,Assess metaphor comprehension and respond Y or N.
+176,Mark Y or N depending on interpretation accuracy.
+177,Decide whether the explanation is correct and answer Y or N.
+178,Judge the interpretation sentence and mark Y or N.
+179,Choose Y or N after evaluating how well the metaphorical sentence is interpreted.
+180,Respond Y or N to indicate explanation validity.
+181,Assess interpretation accuracy and choose Y or N.
+182,Determine whether the metaphor is correctly explained and mark Y or N.
+183,Use Y or N to indicate correctness.
+184,Judge explanation quality of the metaphor and answer Y or N.
+185,Decide Y or N after checking interpretation.
+186,Assess metaphor understanding and respond Y or N.
+187,Choose Y or N to show interpretation validity.
+188,Judge explanation correctness and mark Y or N.
+189,Respond with Y or N based on interpretation accuracy.
+190,Determine explanation validity and choose Y or N.
+191,Use Y or N to reflect metaphor comprehension.
+192,Choose Y or N if the second sentence accurately conveys what the metaphor implies.
+193,Judge whether the explanation matches and mark Y or N.
+194,Decide Y or N after reviewing metaphor meaning.
+195,Respond Y or N if the interpretation of the metaphor is correct.
+196,"Presented for your consideration is a pair of sentences, one of which is metaphorical. Answer Y for yes and N for no whether the second sentence correctly interprets the meaning of the first."
+197,Judge the metaphor–interpretation pairing and mark Y or N.
+198,Judge correctness of the second sentence in terms of the metaphorical meaning of the first and mark Y or N.
+199,Determine whether the explanation of the metaphor is valid and respond Y or N.

@@ -137,3 +137,8 @@ dmypy.json
 # Project files
 sketch*
 arxiv2026_instruction_vectors/sketch*
+output/path_analysis/*
+
+# Misc
+.DS_Store
+*.pt

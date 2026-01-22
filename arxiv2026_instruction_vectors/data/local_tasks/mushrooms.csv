@@ -1,0 +1,197 @@
+query,m_color,m_edible
+portobello,brown,yes
+enoki,white,yes
+fly amanita,red,no
+death cap,brown,no
+chanterelle,yellow,yes
+morel,brown,yes
+oyster mushroom,white,yes
+shiitake,brown,yes
+black trumpet,black,yes
+lion's mane,white,yes
+king oyster,brown,yes
+puffball,white,yes
+wood ear,brown,yes
+matsutake,brown,yes
+porcini,brown,yes
+cauliflower mushroom,white,yes
+coral mushroom,yellow,yes
+shaggy mane,white,yes
+velvet foot,orange,yes
+hen of the woods,brown,yes
+chicken of the woods,orange,yes
+inky cap,black,yes
+field mushroom,white,yes
+giant puffball,white,yes
+blewit,lilac,yes
+saffron milk cap,orange,yes
+beefsteak fungus,red,yes
+green-spored parasol,green,no
+jack-o'-lantern,orange,no
+destroying angel,white,no
+panther cap,brown,no
+false morel,brown,no
+brick cap,red,no
+earthball,brown,no
+witch's butter,yellow,yes
+purple jellydisc,purple,yes
+scarlet elf cup,red,yes
+wood blewit,purple,yes
+stinkhorn,white,no
+black morel,brown,yes
+white morel,white,yes
+yellow morel,yellow,yes
+winter chanterelle,brown,yes
+hedgehog mushroom,orange,yes
+meadow mushroom,white,yes
+slippery jack,brown,yes
+bay bolete,brown,yes
+lurid bolete,red,no
+bitter bolete,brown,no
+parasol mushroom,brown,yes
+green brittlegill,green,no
+charcoal burner,purple,yes
+rosy russula,pink,yes
+yellow swamp russula,yellow,no
+bloody brittlegill,red,no
+crab brittlegill,pink,no
+death trumpet,black,yes
+ivory funnel,white,no
+tawny funnel,brown,no
+false chanterelle,orange,no
+deadly webcap,brown,no
+cortinarius violet webcap,purple,no
+spider webcap,brown,no
+fairy ring champignon,white,yes
+orange peel fungus,orange,yes
+burnt matchstick fungus,black,no
+orange mycena,orange,no
+bleeding mycena,red,no
+candlesnuff fungus,white,no
+scarlet waxcap,red,yes
+blackening waxcap,black,yes
+parrot waxcap,green,yes
+golden waxcap,yellow,yes
+pink waxcap,pink,yes
+crimson waxcap,red,yes
+orange waxcap,orange,yes
+fibrecap,brown,no
+sulphur tuft,yellow,no
+alder bracket,brown,no
+artist’s conk,brown,no
+birch polypore,brown,yes
+turkey tail,brown,yes
+red belt conk,red,no
+reishi,brown,yes
+lacquered bracket,red,yes
+ash tree bracket,white,no
+oysterling,white,yes
+yellow stagshorn,yellow,yes
+earthstar,brown,yes
+collared earthstar,brown,yes
+purple pouch fungus,purple,no
+hairy curtain crust,brown,no
+split gill,white,yes
+golden chantarelle,yellow,yes
+alder tongue fungus,red,no
+deceiver,purple,yes
+lilac bonnet,purple,yes
+frosty bonnet,white,yes
+trooping funnel,white,yes
+club foot mushroom,orange,yes
+shiny cap,brown,no
+false shaggy mane,brown,no
+blusher,brown,yes
+brown roll-rim,brown,no
+clouded agaric,grey,yes
+wood tuft,brown,yes
+conifer tuft,orange,no
+honey fungus,brown,yes
+white coral,white,yes
+pink coral,pink,yes
+violet coral,purple,yes
+crown coral,white,yes
+club coral,yellow,yes
+giant club,yellow,yes
+dog stinkhorn,white,no
+cage fungus,red,no
+lattice stinkhorn,red,no
+bridal veil stinkhorn,white,no
+starfish fungus,red,no
+basket stinkhorn,white,no
+mitered stinkhorn,white,no
+netted stinkhorn,white,no
+stalked puffball,white,yes
+pear-shaped puffball,white,yes
+spiny puffball,white,yes
+warted puffball,brown,yes
+dusky puffball,brown,yes
+brown puffball,brown,yes
+purple puffball,purple,yes
+orange pore fungus,orange,no
+blue milk mushroom,blue,yes
+green milk mushroom,green,no
+latex milky cap,white,yes
+peppery milkcap,brown,yes
+zoned milkcap,orange,yes
+weeping milkcap,white,yes
+fragrant milkcap,white,yes
+woolly milkcap,orange,yes
+ugly milkcap,brown,no
+ashy milkcap,grey,yes
+blue roundhead,blue,yes
+yellow roundhead,yellow,yes
+red lead roundhead,red,no
+plums and custard,purple,yes
+big laughing gym,orange,no
+spectacular rustgill,orange,no
+wood woollyfoot,orange,yes
+red cracking bolete,red,yes
+scarletina bolete,red,yes
+bay cup fungus,brown,yes
+devil's urn,black,no
+elfin saddle,brown,no
+black elfin saddle,black,no
+grey saddle,grey,no
+white saddle,white,no
+spindle-shaped yellow coral,yellow,yes
+green elfcup,green,yes
+orange jelly,orange,yes
+white jelly fungus,white,yes
+black jelly roll,black,yes
+amber jelly roll,orange,yes
+witch’s hat,black,yes
+conifer blueing bracket,blue,no
+rosy bonnet,pink,yes
+dusky bonnet,brown,yes
+yellowleg bonnet,orange,yes
+ivory bonnet,white,yes
+fringed bonnet,white,yes
+snapping bonnet,brown,yes
+poison pie,brown,no
+common rustgill,orange,no
+purple cort,purple,no
+blue foot,blue,yes
+golden pholiota,yellow,yes
+conifer tuft pholiota,brown,no
+dryad's saddle,brown,yes
+elm oyster,white,yes
+angel's wings,white,yes
+alder bracket polypore,brown,no
+conifer mazegill,brown,no
+bearded tooth,white,yes
+tiered tooth,white,yes
+yellow tooth,yellow,yes
+spiny tooth,brown,yes
+crown-tipped coral,white,yes
+yellow fairy club,yellow,yes
+pinkgill,pink,yes
+rosy pinkgill,pink,yes
+giant gymnopilus,orange,no
+fool's webcap,brown,no
+semaphorus waxcap,yellow,yes
+yellow knight,yellow,yes
+blewit knight,brown,yes
+fool's funnel,white,no
+charcoal fungus,black,no
+rusty gilled polypore,brown,no

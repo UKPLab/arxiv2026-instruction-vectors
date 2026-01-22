@@ -1,0 +1,143 @@
+query,adj_comp,adj_ant
+big,bigger,small
+small,smaller,big
+good,better,bad
+bad,worse,good
+bright,brighter,dark
+dark,darker,bright
+deep,deeper,shallow
+shallow,shallower,deep
+fast,faster,slow
+slow,slower,fast
+happy,happier,sad
+sad,sadder,happy
+high,higher,low
+low,lower,high
+long,longer,short
+short,shorter,long
+strong,stronger,weak
+weak,weaker,strong
+hot,hotter,cold
+cold,colder,hot
+soft,softer,hard
+hard,harder,soft
+rich,richer,poor
+poor,poorer,rich
+young,younger,old
+old,older,young
+light,lighter,heavy
+heavy,heavier,light
+thick,thicker,thin
+thin,thinner,thick
+wide,wider,narrow
+narrow,narrower,wide
+early,earlier,late
+late,later,early
+clean,cleaner,dirty
+dirty,dirtier,clean
+safe,safer,dangerous
+dangerous,more dangerous,safe
+sharp,sharper,blunt
+blunt,blunter,sharp
+kind,kinder,cruel
+cruel,crueler,kind
+polite,politer,rude
+rude,ruder,polite
+clear,clearer,unclear
+unclear,more unclear,clear
+brave,braver,cowardly
+cowardly,more cowardly,brave
+smooth,smoother,rough
+rough,rougher,smooth
+fresh,fresher,stale
+stale,staler,fresh
+full,fuller,empty
+empty,emptier,full
+gentle,gentler,harsh
+harsh,harsher,gentle
+true,truer,false
+false,more false,true
+quiet,quieter,loud
+loud,louder,quiet
+lazy,lazier,industrious
+industrious,more industrious,lazy
+friendly,friendlier,unfriendly
+unfriendly,more unfriendly,friendly
+near,nearer,far
+far,farther,near
+proud,prouder,humble
+humble,humbler,proud
+tight,tighter,loose
+loose,looser,tight
+wise,wiser,foolish
+foolish,more foolish,wise
+modern,more modern,ancient
+ancient,more ancient,modern
+thirsty,thirstier,quenched
+quenched,more quenched,thirsty
+tall,taller,short
+short,shorter,tall
+radiant,more radiant,dull
+dull,duller,radiant
+careful,more careful,careless
+careless,more careless,careful
+likely,likelier,impossible
+rare,rarer,common
+visible,more visible,invisible
+invisible,more invisible,visible
+patient,more patient,impatient
+impatient,more impatient,patient
+healthy,healthier,sick
+sick,sicker,healthy
+honest,more honest,dishonest
+dishonest,more dishonest,honest
+expensive,more expensive,cheap
+cheap,cheaper,expensive
+safe,safer,unsafe
+unsafe,more unsafe,safe
+serious,more serious,playful
+playful,more playful,serious
+busy,busier,idle
+idle,idler,busy
+curly,curlier,straight
+straight,straighter,curly
+wet,wetter,dry
+dry,drier,wet
+noisy,noisier,quiet
+quiet,quieter,noisy
+lovely,lovelier,ugly
+ugly,uglier,lovely
+sunny,sunnier,cloudy
+cloudy,cloudier,sunny
+warm,warmer,cool
+cool,cooler,warm
+bold,bolder,meek
+meek,meeker,bold
+generous,more generous,stingy
+stingy,stingier,generous
+tidy,tidier,messy
+messy,messier,tidy
+sweet,sweeter,sour
+sour,more sour,sweet
+fancy,fancier,plain
+plain,plainer,fancy
+murky,murkier,clear
+wary,warier,trusting
+lanky,lankier,stocky
+nimble,nimbler,clumsy
+clumsy,clumsier,nimble
+grimy,grimier,clean
+close,closer,distant
+distant,more distant,close
+lucky,luckier,unlucky
+unlucky,unluckier,lucky
+simple,simpler,complex
+complex,more complex,simple
+easy,easier,difficult
+difficult,more difficult,easy
+roomy,roomier,cramped
+cramped,more cramped,roomy
+drowsy,drowsier,alert
+alert,more alert,drowsy
+strange,stranger,typical
+typical,more typical,strange
