@@ -1,28 +1,17 @@
 import os
 from collections import defaultdict
 
-import numpy as np
 import pandas as pd
 import torch
 from tqdm import tqdm
 
-from arxiv2026_instruction_vectors import config
+from arxiv2026_instruction_vectors import config, PROJECT_ROOT
 from arxiv2026_instruction_vectors.graph_utils import (
-    active_heads_heatmap,
     active_heads_heatmap_tinst_only,
-    single_query_heatmap,
 )
-
 
 def save_graphing_info(task, src_token, task_dir, sample_idx, prompt_tokens, num_heads=16):
     all_paths_by_src = {}
-    results_df = {
-        "path;next_path": [],
-        "subtuple_idx": [],
-        "src_layer": [],
-        "targ_token": [],
-        "head_change_idx": [],
-        }
     heads_df = defaultdict(list)
     heads_df["path_idx"]
     heads_df["path"]
@@ -30,7 +19,6 @@ def save_graphing_info(task, src_token, task_dir, sample_idx, prompt_tokens, num
         heads_df[f"head_{i}"]
 
     results_dir = f"{task_dir}/{sample_idx}"
-    results_file = f"{results_dir}/{model}_{task}_sample_{sample_idx}_token_{src_token}_paths_analysis.csv"
     heads_file = f"{results_dir}/{src_token}_heads.csv"
 
     # Load the CSV containing the high-ranking paths
@@ -40,7 +28,6 @@ def save_graphing_info(task, src_token, task_dir, sample_idx, prompt_tokens, num
 
     paths = [contribs_df.loc[i]["path"] for i in range(len(contribs_df))]
     all_paths_by_src[src_token] = paths
-    differences = defaultdict(dict)
     
     # Gather info on which heads are consistently active/inactive within 1 path
     activity = {layer: {f"head_{i}": [0, 0] for i in range(num_heads)} for layer in range(config.n_layers)}   # head_i: [%active, %inactive]
@@ -59,14 +46,9 @@ def save_graphing_info(task, src_token, task_dir, sample_idx, prompt_tokens, num
                     activity[layer][f"head_{head_idx}"][0] += 1
                 else:
                     activity[layer][f"head_{head_idx}"][1] += 1
-                #print("LAYER:", layer, "HEAD:", head_idx)
-                #print("0:", activity[layer][f"head_{head_idx}"][0])
-                #print("1:", activity[layer][f"head_{head_idx}"][1])
 
     # Calculate the ratio of activity to inactivity for each layer-head across all subtuples&paths     
     for layer in range(config.n_layers):       
-        num_subtuples = len(path) - 1  # Don't take the None path into account
-        head_occurences = len(paths)
         for head_idx in range(num_heads):
             head_act_task1 = activity[layer][f"head_{head_idx}"][0]
             head_act_task2 = activity[layer][f"head_{head_idx}"][1]
@@ -80,130 +62,31 @@ def save_graphing_info(task, src_token, task_dir, sample_idx, prompt_tokens, num
             activity[layer][f"head_{head_idx}"][0] = head_act_task1
             activity[layer][f"head_{head_idx}"][1] = head_act_task2
 
-    #print("ACTIVITY:", activity, sample_idx)
-
-    """
-    for i in range(len(paths)):  
-        path = paths[i]
-        heads_df["path_idx"].append(i)
-        heads_df["path"].append(path)
-
-        for i in range(num_heads):
-            active_count = 0
-            inactive_count = 0
-            num_subtuples = len(path)
-            for j in range(num_subtuples):
-                subtuple = path[j]
-                if subtuple[1] is None:
-                    continue
-                head = subtuple[1][0][i]
-                if head:
-                    active_count += 1
-                    activity[f"head_{i}"][0] += 1
-                else:
-                    inactive_count += 1
-                    activity[f"head_{i}"][1] += 1
-
-            heads_df[f"head_{i}"].append([active_count, inactive_count])
-
-
-        #print("HEADS DF:", heads_df)
-
-
-
-        # Next, do comparisons with the next path
-        try:
-            # Make sure the next row exists
-            next_row = paths[i+1]
-            # If not, then we're done
-        except IndexError:
-            break
-
-        for j in range(len(path)):
-            # Compare subtuple j of path_idx to subtuple j of path_idx+1
-            subtuple = path[j]
-            subtuple_next_row = next_row[j]
-            if subtuple[1] is None:
-                continue
-            num_heads = len(subtuple[1][0])
-            comparison = [
-                subtuple[0] == subtuple_next_row[0],                      # source layers equal?
-                torch.equal(subtuple[1][0], subtuple_next_row[1][0]),     # active heads equal?
-                subtuple[1][1] == subtuple_next_row[1][1],                # include skip? 
-                subtuple[2] == subtuple_next_row[2]                       # targ tokens equal?
-                ]
-            if comparison == [True, True, True, True]:
-                pass
-            else:
-                # Src layers are different
-                if not comparison[0]:
-                    differences[(i, i+1)]["src_layers"] = [j, subtuple[0], subtuple_next_row[0]]
-                    results_df["path;next_path"].append((i, i+1))
-                    results_df["subtuple_idx"].append(j)
-
-                # Active heads are different 
-                if not comparison[1]:
-                    differences[(i, i+1)]["active_heads"] = [j, subtuple[1][0], subtuple_next_row[1][0]]
-                    results_df["path;next_path"].append((i, i+1))
-                    results_df["subtuple_idx"].append(j)
-                    if subtuple[0] == subtuple_next_row[0]:
-                        src_layer_at_change = subtuple[0]
-                    else:
-                        src_layer_at_change = (subtuple[0], subtuple_next_row[0])
-                    results_df["src_layer"].append(src_layer_at_change)
-                    change_idxs = []
-                    for head_idx in range(len(subtuple[1][0])):
-                        if torch.eq(subtuple[1][0][head_idx], subtuple_next_row[1][0][head_idx]):
-                            continue
-                        else:
-                            change_idxs.append(head_idx)
-                            #change_idxs.append((f"{subtuple[1][0][head_idx]} --> {subtuple_next_row[1][0][head_idx]}"))
-                    results_df["head_change_idx"].append(change_idxs)
-                    if subtuple[2] == subtuple_next_row[2]:
-                        targ_token_at_change = subtuple[2]
-                    else:
-                        targ_token_at_change = (subtuple[2], subtuple_next_row[2])
-                    results_df["targ_token"].append(targ_token_at_change)
-
-                # Include Skip is different
-                if not comparison[2]:
-                    differences[(i, i+1)]["include_skip"] = [j, subtuple[1][1], subtuple_next_row[1][1]]
-
-                # Targ tokens are different
-                if not comparison[3]:
-                    differences[(i, i+1)]["targ_tokens"] = [j, subtuple[2], subtuple_next_row[2]]
-        """
-    #results_df = pd.DataFrame(results_df)
-    #results_df.to_csv(results_file)
-    #print("Saved results to:", results_file)
-    
     heads_df = pd.DataFrame(heads_df)
     heads_df.to_csv(heads_file)
-    #print("Saved heads to:", heads_file)
     return heads_df, activity
 
+
 model = "olmo-1b"
-main_dir = "src/"
 
 samples = [i for i in range(0, 100)]
 
 task_idx = 0
-model_dir = f"output/analysis/path_analysis/{model}"
+model_dir = f"{PROJECT_ROOT}/experiments/output/analysis/path_analysis/{model}"
 base_task = ["adjectives", "animals"][task_idx]
 task_pair = [
     ["adjectives_adj_comp", "adjectives_adj_ant"],
     ["animals_anim_color", "animals_can_fly"]][task_idx]  # choose a task pair
 task_dirs = [
-    f"output/analysis/path_analysis/{model}/{task_pair[0]}",
-    f"output/analysis/path_analysis/{model}/{task_pair[1]}"
+    f"{PROJECT_ROOT}/experiments/output/analysis/path_analysis/{model}/{task_pair[0]}",
+    f"{PROJECT_ROOT}/experiments/output/analysis/path_analysis/{model}/{task_pair[1]}"
     ]
 query_tok_idx = 12
 token_positions = list(range(20))
 num_heads=16
 
 tok_info = defaultdict(dict)
-graph_file_s = f"output/graphs/heads_{base_task}_avg_tinst.png"
-
+graph_file_s = f"{PROJECT_ROOT}/experiments/output/graphs/heads_{base_task}_avg_tinst.png"
 len_longest_overall = 0
 
 for sample_idx in tqdm(samples):
@@ -230,7 +113,6 @@ for sample_idx in tqdm(samples):
 
     if longest_prompt > len_longest_overall:
         len_longest_overall = longest_prompt
-
 
     for token_pos in range(longest_prompt):
         # This is the name of the paths file for this token (if the file exists)
@@ -269,8 +151,7 @@ for token_pos in tok_info:
                     tok_info[token_pos][task][src_layer][head] = act_perc
 
 
-
-
+# Now, make the heatmap graph averaged over all token positions
 active_heads_heatmap_tinst_only(
     tok_info,
     (task_pair[0], task_pair[1]), 

@@ -14,13 +14,14 @@ from nnsight import CONFIG, LanguageModel, util
 from nnsight.tracing.graph import Proxy
 from tqdm import tqdm
 
-from arxiv2026_instruction_vectors import config
+from arxiv2026_instruction_vectors import config, PROJECT_ROOT
 from arxiv2026_instruction_vectors.data.load_datasets import load_task
 from arxiv2026_instruction_vectors.metric_utils import compute_rr
 
 load_dotenv()
 
 login(token=os.getenv("API_TOKEN"))
+
 
 # Make deterministic
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
@@ -57,7 +58,7 @@ def patch_multiple_layers(combinations):
         subtask = config.args.subtask
 
     # Make output dir:
-    scores_dir = f"output/patching_scores/{config.short_name}/{subtask}"
+    scores_dir = f"{PROJECT_ROOT}/experiments/output/patching_scores/{config.short_name}/{subtask}"
     os.makedirs(scores_dir, exist_ok=True)
     print("Made out dir:", scores_dir)
 
@@ -77,8 +78,8 @@ def patch_multiple_layers(combinations):
     cache_prompt = cache_prompts[0]
 
     # Prepare output paths for text responses and graphs
-    os.makedirs(f"output/graphs/{config.args.task}/{config.short_name}", exist_ok=True)
-    os.makedirs(f"output/responses/{config.args.task}/{config.short_name}", exist_ok=True)
+    os.makedirs(f"{PROJECT_ROOT}/experiments/output/graphs/{config.args.task}/{config.short_name}", exist_ok=True)
+    os.makedirs(f"{PROJECT_ROOT}/experiments/output/responses/{config.args.task}/{config.short_name}", exist_ok=True)
 
     logit_diffs_all_samples_1 = {tuple: [] for tuple in combinations}
     logit_diffs_all_samples_2 = {tuple: [] for tuple in combinations}
@@ -209,15 +210,6 @@ def patch_multiple_layers(combinations):
                 rr_diff_2 = (rr_patched - rr_iwt)
                 logit_diffs_this_tuple_2.append(patched_logit_diff_2.item())
                 rr_diffs_this_tuple_2.append(rr_diff_2)
-
-                """# Control Check: Instruction+Target vs. Target-Only
-                patched_logit_diff_3 = (
-                    instr_with_target_logits[0, -1, correct_token_id]
-                    - target_only_logits[0, -1, correct_token_id]
-                )
-                rr_diff_3 = (rr_iwt - rr_unm)
-                logit_diffs_this_tuple_3.append(patched_logit_diff_3.item())
-                rr_diffs_this_tuple_3.append(rr_diff_3)"""
 
                 # Additional Check: logit diff between highest-logit token and second-highest token
                 # 1: patched setting

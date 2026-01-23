@@ -1,7 +1,7 @@
 """
 Arguments and settings for the whole project
 """
-from .args import create_parser
+from arxiv2026_instruction_vectors.args import create_parser
 
 # Set project args
 parser = create_parser()

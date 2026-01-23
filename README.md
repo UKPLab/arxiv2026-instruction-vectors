@@ -6,15 +6,12 @@
 [![Arxiv](https://img.shields.io/badge/Arxiv-YYMM.NNNNN-red?style=flat-square&logo=arxiv&logoColor=white)](https://put-here-your-paper.com)
 [![License](https://img.shields.io/github/license/UKPLab/arxiv2026-instruction-vectors)](https://opensource.org/licenses/Apache-2.0)
 [![Python Versions](https://img.shields.io/badge/Python-3.9-blue.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![CI](https://github.com/UKPLab/arxiv2026-instruction-vectors/actions/workflows/main.yml/badge.svg)](https://github.com/UKPLab/arxiv2026-instruction-vectors/actions/workflows/main.yml)
 
-This is the official template for new Python projects at UKP Lab. It was adapted for the needs of UKP Lab from the excellent [python-project-template](https://github.com/rochacbruno/python-project-template/) by [rochacbruno](https://github.com/rochacbruno).
+This is the accompanying code repository for the paper [Patches of Nonlinearity: Instruction Vectors in Large Language Models](https://github.com/UKPLab/arxiv2026-instruction-vectors).
 
-It should help you start your project and give you continuous status updates on the development through [GitHub Actions](https://docs.github.com/en/actions).
+> **Abstract:** Despite the recent success of instruction-tuned language models and their ubiquitous usage, very little is known of how models process instructions internally. In this work, we address this gap from a mechanistic point of view by investigating how instruction-specific representations are constructed and utilized in different stages of post-training: Supervised Fine-Tuning (SFT) and Direct Preference Optimization (DPO). Via causal mediation, we identify that instruction representation is fairly localized in models. These representations, which we call _Instruction Vectors_ (IVs), demonstrate a curious juxtaposition of linear separability along with non-linear causal interaction, broadly questioning the scope of the linear representation hypothesis commonplace in mechanistic interpretability. To disentangle the non-linear causal interaction, we propose a novel method to localize information processing in language models that is free from the implicit linear assumptions of patching-based techniques. We find that, conditioned on the task representations formed in the early layers, different information pathways are selected in the later layers to solve that task, i.e., IVs act as _circuit selectors_.
 
-> **Abstract:** The study of natural language processing (NLP) has gained increasing importance in recent years, with applications ranging from machine translation to sentiment analysis. Properly managing Python projects in this domain is of paramount importance to ensure reproducibility and facilitate collaboration. The template provides a structured starting point for projects and offers continuous status updates on development through GitHub Actions. Key features include a basic setup.py file for installation, packaging, and distribution, documentation structure using mkdocs, testing structure using pytest, code linting with pylint, and entry points for executing the program with basic CLI argument parsing. Additionally, the template incorporates continuous integration using GitHub Actions with jobs to check, lint, and test the project, ensuring robustness and reliability throughout the development process.
-
-Contact person: [Federico Tiblias](mailto:federico.tiblias@tu-darmstadt.de) 
+Contact person: [Irina Bigoulaeva](mailto:irina.bigoulaeva@gmail.com) 
 
 [UKP Lab](https://www.ukp.tu-darmstadt.de/) | [TU Darmstadt](https://www.tu-darmstadt.de/
 )
@@ -24,78 +21,28 @@ Don't hesitate to send us an e-mail or report an issue, if something is broken (
 
 ## Getting Started
 
-> **DO NOT CLONE OR FORK**
+Our inference experiments require [vLLM](https://docs.vllm.ai/en/latest/) as a dependency. It's recommended to install this in a clean environment first.
 
-If you want to set up this template:
+Optionally, vLLM can be installed in a separate environment.
 
-1. Request a repository on UKP Lab's GitHub by following the standard procedure on the wiki. It will install the template directly. Alternatively, set it up in your personal GitHub account by clicking **[Use this template](https://github.com/rochacbruno/python-project-template/generate)**.
-2. Wait until the first run of CI finishes. Github Actions will commit to your new repo with a "✅ Ready to clone and code" message.
-3. Delete optional files: 
-    - If you don't need automatic documentation generation, you can delete folder `docs`, file `.github\workflows\docs.yml` and `mkdocs.yml`
-    - If you don't want automatic testing, you can delete folder `tests` and file `.github\workflows\tests.yml`
-    - If you do not wish to have a project page, delete folder `static` and files `.nojekyll`, `index.html`
-4. Prepare a virtual environment:
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install .
-pip install -r requirements-dev.txt # Only needed for development
+uv pip install vllm
 ```
-5. Adapt anything else (for example this file) to your project. 
 
-6. Read the file [ABOUT_THIS_TEMPLATE.md](ABOUT_THIS_TEMPLATE.md)  for more information about development.
+Next, install the remaining packages in `uv.lock`.
+
+```bash
+uv sync
+```
 
 ## Usage
 
-### Using the classes
+Running the activation patching experiments:
 
-To import classes/methods of `arxiv2026_instruction_vectors` from inside the package itself you can use relative imports: 
-
-```py
-from .base import BaseClass # Notice how I omit the package name
-
-BaseClass().something()
-```
-
-To import classes/methods from outside the package (e.g. when you want to use the package in some other project) you can instead refer to the package name:
-
-```py
-from arxiv2026_instruction_vectors import BaseClass # Notice how I omit the file name
-from arxiv2026_instruction_vectors.subpackage import SubPackageClass # Here it's necessary because it's a subpackage
-
-BaseClass().something()
-SubPackageClass().something()
-```
-
-### Using scripts
-
-This is how you can use `arxiv2026_instruction_vectors` from command line:
-
-```bash
-$ python -m arxiv2026_instruction_vectors
-```
-
-### Expected results
-
-After running the experiments, you should expect the following results:
-
-(Feel free to describe your expected results here...)
-
-### Parameter description
-
-* `x, --xxxx`: This parameter does something nice
-
-* ...
-
-* `z, --zzzz`: This parameter does something even nicer
-
-## Development
-
-Read the FAQs in [ABOUT_THIS_TEMPLATE.md](ABOUT_THIS_TEMPLATE.md) to learn more about how this template works and where you should put your classes & methods. Make sure you've correctly installed `requirements-dev.txt` dependencies
 
 ## Cite
 
-Please use the following citation:
+If you found our work helpful, please cite our paper:
 
 ```
 @InProceedings{smith:20xx:CONFERENCE_TITLE,

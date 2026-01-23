@@ -190,7 +190,6 @@ def head_change_heatmap(head_changes_all, num_samples, decoded_tokens, model, ta
         fig, axs = plt.subplots(
             n_rows, n_cols, 
             figsize=(16, 16),
-            #layout="constrained"
         )
         dropped_last = False
     else:
@@ -198,7 +197,6 @@ def head_change_heatmap(head_changes_all, num_samples, decoded_tokens, model, ta
         fig, axs = plt.subplots(
             n_rows, n_cols, 
             figsize=(16, 16),
-            #layout="constrained"
         )
         fig.delaxes(axs[-1,1])
         dropped_last = True
@@ -216,18 +214,14 @@ def head_change_heatmap(head_changes_all, num_samples, decoded_tokens, model, ta
         for layer in layers:
             if layer in head_changes_all[src_token]:#head_changes_s:
                 for head_idx in range(len(head_changes_all[src_token][layer])):
-                    #print("Avg number of changes across all samples", head_changes_all[src_token][layer])
-                    #values_matrix[layer][head_idx] += 1
                     values_matrix[layer][head_idx] += head_changes_all[src_token][layer][head_idx]
 
         # Reverse the y-axis to make graph more readable
         values_matrix = [list(reversed(l)) for l in values_matrix]
         
-        #print("MAX 1:", max(values_matrix))
         max_val = max(max(values_matrix))
         values_matrices.append(values_matrix)
         max_all_tokens.append(max_val)
-        #print("MAX OF THIS:", values_matrix)
 
     # Make a colorbar
     cmap = mpl.colormaps['GnBu']
@@ -239,7 +233,6 @@ def head_change_heatmap(head_changes_all, num_samples, decoded_tokens, model, ta
         bounds = np.arange(0, max_n_changes + 1)
     else:
         bounds = [0,1]
-    #norm = mpl.colors.BoundaryNorm(boundaries=bounds, ncolors=cmap.N)
     norm = mpl.colors.Normalize(vmin=0, vmax=max_n_changes)
     
     # Make the plots
@@ -442,13 +435,10 @@ def active_heads_heatmap_tinst_only(
             axs[col_idx].text(19.3,7,"% activity", size=10, verticalalignment='center', rotation=270)
             
 
-    #axs[0][0].text(3,-4,"Adj-Comparative", size=20, verticalalignment='top')
-    #axs[0][1].text(4,-4,"Adj-Antonym", size=20, verticalalignment='top')
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     fig.subplots_adjust(hspace=0.3, wspace=0.4, right=0.2)
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
     print("Fig saved to:", save_path)
-    #plt.show()
     return
 
 
@@ -496,8 +486,6 @@ def active_heads_heatmap(
 
     # Make a colorbar
     cmap = mpl.colormaps['RdPu']
-    #bounds = [0,1.0]
-    #norm = mpl.colors.BoundaryNorm(boundaries=bounds, ncolors=cmap.N)
     norm = mpl.colors.Normalize(vmin=0, vmax=1.0)
     
     # Make the plots
@@ -512,7 +500,6 @@ def active_heads_heatmap(
             try:
                 decoded_token = prompt[token_idx]
                 data_one_task = np.array(both_tasks_per_token[token_idx][col_idx])
-                #norm = mpl.colors.Normalize(vmin=0, vmax=np.max(data_one_task))
                 data_one_task = data_one_task[:, :, 0]   # slice idx 0 to just get the activity % (inactivty at idx 1 follows trivially)
 
                 # Reverse the presentation order of heads to make the heatmap axes more readable
@@ -560,8 +547,6 @@ def make_scatter(data_all_samples, save_path, title, reduction_method="pca"):
 
     # Plot the reduced representation of each sample on one axis
     scatter = ax.scatter(hs_reduced[:, 0], hs_reduced[:, 1],
-    #c=color_per_task[task_name],
-    #cmap=cmap_per_task[task_name],
     )
     fig.suptitle(title, verticalalignment='center')
 

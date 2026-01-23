@@ -80,10 +80,8 @@ def get_attn_paths(model, prompt, prompt_tokens, start_pos, end_pos=-1):
 
     # Get paths from start_pos onward
     all_paths = {}
-    #for s in range(start_pos, seq_len):   # NOTE: Modified IB
     for s in range(start_pos, end_pos):
         all_paths[s] = enumerate_paths_from(s)
-    print("ALL PATHS KEYS:", all_paths.keys())
     return all_paths
 
 def get_model_for_paths(model, prompt, paths, start_pos=None):

@@ -7,13 +7,14 @@ from torch.utils.data import DataLoader
 from transformers import AutoTokenizer
 from vllm import LLM, SamplingParams
 
-from arxiv2026_instruction_vectors import config
+from arxiv2026_instruction_vectors import config, PROJECT_ROOT
 from arxiv2026_instruction_vectors.data.load_datasets import InferenceDataset, load_task
 from arxiv2026_instruction_vectors.metric_utils import (
     basic_accuracy,
     instruction_accuracy,
     judge_accuracy,
 )
+
 
 # Make deterministic
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
@@ -40,23 +41,20 @@ task_samples, task_instruction = (
 task_samples = InferenceDataset(task_samples)
 
 # Prepare output paths for text responses and graphs
-if "score_sheets" not in os.listdir(config.main_dir):
-    os.mkdir(config.main_dir + "score_sheets")
-if config.args.task not in os.listdir(config.main_dir + "responses/"):
-    os.mkdir(config.main_dir + "responses/" + config.args.task)
-if config.args.task not in os.listdir(config.main_dir + "graphs/"):    
-    os.mkdir(config.main_dir + "graphs/" + config.args.task)
+if "score_sheets" not in os.listdir(PROJECT_ROOT / "experiments/output/"):
+    os.makedirs(PROJECT_ROOT / "experiments/output/score_sheets", exist_ok=True)
+if config.args.task not in os.listdir(PROJECT_ROOT / "experiments/output/responses/"):
+    os.makedirs(PROJECT_ROOT / "experiments/output/responses/" / config.args.task, exist_ok=True)
+if config.args.task not in os.listdir(PROJECT_ROOT / "experiments/output/graphs/"):    
+    os.makedirs(PROJECT_ROOT / "experiments/output/graphs/" / config.args.task, exist_ok=True)
 
 # Make model subfolders
-if config.short_name not in os.listdir(config.main_dir + "responses/" + config.args.task):
-    os.mkdir (config.main_dir + "responses/" + config.args.task + "/" + config.short_name)
+if config.short_name not in os.listdir(PROJECT_ROOT / "experiments/output/responses/" / config.args.task):
+    os.makedirs(PROJECT_ROOT / "experiments/output/responses/" / config.args.task / config.short_name, exist_ok=True)
+response_file = PROJECT_ROOT / "experiments/output/responses" / config.args.task / config.short_name / "response.txt"
 
-response_file = config.main_dir + "responses/{}/{}/response.txt".format(
-    config.args.task, 
-    config.short_name, 
-)
-score_sheet = config.main_dir + "score_sheets/{}.csv".format(config.short_name)
-if config.short_name + ".csv" in os.listdir(config.main_dir + "score_sheets"):
+score_sheet = PROJECT_ROOT / "experiments/output/score_sheets" / "{}.csv".format(config.short_name)
+if config.short_name + ".csv" in os.listdir(PROJECT_ROOT / "experiments/output/score_sheets"):
     header = False
 else:
     header = True

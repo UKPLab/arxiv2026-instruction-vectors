@@ -1,7 +1,6 @@
 """
 Logistic regression based on the instruction representations.
 Goal is to determine whether the categories are linearly separable.
-
 """
 
 import gc
@@ -14,9 +13,7 @@ import torch
 from datasets import Dataset, concatenate_datasets, disable_caching, load_from_disk
 from nnsight import LanguageModel
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
 from arxiv2026_instruction_vectors.data.load_datasets import config, load_task
@@ -27,7 +24,7 @@ disable_caching()
 def make_train_test(tasks, save_name, varying, model_component, layer=None):
     """
     Make the train and test sets for the probe.
-    :param layer: Optionally train on hidden states from a specific layer onlys
+    :param layer: Optionally train on hidden states from a specific layer only
     """
 
     if layer is not None:
