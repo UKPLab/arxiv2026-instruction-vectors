@@ -1,7 +1,6 @@
 import torch
 import torch.nn.functional as F
 from collections import defaultdict
-from transformers import AutoTokenizer, AutoConfig
 import gc
 from tqdm import tqdm
 
