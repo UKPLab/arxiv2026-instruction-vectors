@@ -23,7 +23,7 @@ Install the necessary dependencies in `uv.lock`:
 uv sync
 ```
 
-#### Optional vLLM
+### Optional vLLM
 A subset of our experiments (i.e. `experiments/basic_inference.py`) requires [vLLM](https://docs.vllm.ai/en/latest/) as a dependency. It's recommended to install this in a clean environment first, as specific CUDA versions are required that may introduce incompatibilities. For this reason, our `uv.lock` file excludes vLLM.
 
 We recommend installing vLLM in a separate environment for running the inference experiments.
@@ -67,7 +67,7 @@ Before running experiments, specify necessary hyperparameters in `args.py`.
 
 Additionally, there are some parameters that are required for specific experiments.
 
-### Activation Patching
+## Activation Patching
 
 `--num_choices`: When conducting activation patching, define whether to do 2-layer patching (num_choices=2) or 3-layer patching (num_choices=3). This represents a combinatorial n-choose-k search of tuple pairs/triplets among the *n* model layers. 
 
@@ -81,7 +81,76 @@ uv run activation_patching.py --model_idx 17 --task "adjectives" --subtask "adj_
 uv run activation_patching.py --model_idx 19 --task "metaphor_boolean" --num_choices 3 --num_samples 100
 ```
 
-### Path Tracing
+
+## Statistical Test
+
+After activation patching is done, we perform a t-test on the results. Note that for this script to run, output files (`.pt`) from activation patching must exist.
+
+For conciseness, hyperparameters (models, tasks) are specified in the file directly.
+
+
+Example command:
+
+```bash
+uv run statistical_test.py
+```
+
+
+## Linear Probe and Dimensionality Reduction
+
+For our linear probe experiments, we must produce and load from a dataset of varied instructional samples. These variations of the instruction can either keep the label space constant (e.g. keep a yes/no question a yes/no question), or can change the label space (e.g. turn a yes/no question into an T/F question). 
+
+`--layer_for_dataset`: Optionally, specify a specific model layer idx to save representations from. If specified, no other layers will be done.
+
+`--varying`: 
+  * `instructions` - if label space is not changed
+  * `labels` - if label space is changed.
+
+Note that in our paper, we only vary instructions, so there is a minimal selection of tasks for which a varied label space is predefined in the codebase.
+
+Example commands:
+
+### Make dataset:
+
+The tasks must be specified directly in `linear_probe.py`.
+
+```bash
+# Use Olmo-2 7B to create varied instruction representations (involves activation patching)
+
+uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --make_dataset
+```
+
+### Run probe on the dataset:
+
+```bash
+# Run probe on the Olmo-2 7B representations. The remaining args ensure that the correct dataset is loaded
+
+uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --do_probe
+```
+
+### Plot the clusters using LDA:
+
+```bash
+# Run probe on the Olmo-2 7B representations. The remaining args ensure that the correct dataset is loaded
+
+uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --plot_lda_clusters
+```
+
+
+## Target Task Inference
+
+`--max_tokens`: Specify the max number of output tokens allowed.
+
+`--test_batch_size`: Data loader batch size.
+
+Example command:
+
+```bash
+uv run basic_inference.py --model_idx 19 --task "animals" --subtask "can_fly" --test_batch_size 5 --max_tokens 2
+```
+
+
+## Path Tracing
 
 `--start_pos`: The token position from which to start tracing. Due to long runtimes and an exponentially larger number of paths towards the beginning of the prompt, we recommend tracing from later token positions.
 
@@ -101,61 +170,6 @@ do
         uv run path_tracing.py --model_idx 16 --task "adjectives" --tracing_sample_idx $i --start_pos 11 --end_pos -1 --threshold_rank 100
 done
 
-```
-
-
-### Linear Probe and Dimensionality Reduction
-
-For our linear probe experiments, we must produce and load from a dataset of varied instructional samples. These variations of the instruction can either keep the label space constant (e.g. keep a yes/no question a yes/no question), or can change the label space (e.g. turn a yes/no question into an T/F question). 
-
-`--layer_for_dataset`: Optionally, specify a specific model layer idx to save representations from. If specified, no other layers will be done.
-
-`--varying`: 
-  * `instructions` - if label space is not changed
-  * `labels` - if label space is changed.
-
-Note that in our paper, we only vary instructions, so there is a minimal selection of tasks for which a varied label space is predefined in the codebase.
-
-Example commands:
-
-**Make dataset:**
-
-The tasks must be specified directly in `linear_probe.py`.
-
-```bash
-# Use Olmo-2 7B to create varied instruction representations (involves activation patching)
-
-uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --make_dataset
-```
-
-**Run probe on the dataset:**
-
-```bash
-# Run probe on the Olmo-2 7B representations. The remaining args ensure that the correct dataset is loaded
-
-uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --do_probe
-```
-
-**Plot the clusters using LDA:**
-
-```bash
-# Run probe on the Olmo-2 7B representations. The remaining args ensure that the correct dataset is loaded
-
-uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --plot_lda_clusters
-```
-
-
-### Target Task Inference
-
-`--max_tokens`: Specify the max number of output tokens allowed.
-
-`--test_batch_size`: Data loader batch size.
-
-Example command:
-
-```bash
-
-uv run basic_inference.py --model_idx 19 --task "animals" --subtask "can_fly" --test_batch_size 5 --max_tokens 2
 ```
 
 
