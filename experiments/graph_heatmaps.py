@@ -30,36 +30,49 @@ def load_and_merge_scores(dir, model, subtask, setting_name):
 files_path = f"{PROJECT_ROOT}/experiments/output/patching_scores"
 
 tasks = [
-    "adj_ant",
-    "adj_comp",
-    "anim_color",
-    "can_fly", 
+    #"adj_ant",
+    #"adj_comp",
+    #"anim_color",
+    #"can_fly", 
+    "metaphor_boolean",
+    "implicatures",
+    "object_counting",
+    "snarks"
 ]
 
 task_names = [
-    "adjective: antonym",
-    "adjective: comparative",
-    "animal: color",
-    "animal: can_fly",
+    #"adjective: antonym",
+    #"adjective: comparative",
+    #"animal: color",
+    #"animal: can_fly",
+    "metaphor_boolean",
+    "implicatures",
+    "object_counting",
+    "snarks"
 ]
 
 models = [
     # 16 layers
-    "olmo-1b-dpo",
-    "olmo-1b-sft",
-    "olmo-1b",
+    #"olmo-1b-dpo",
+    #"olmo-1b-sft",
+    #"olmo-1b",
     
     # 32 layers
     #"olmo-7b-dpo",
     #"olmo-7b-sft",
     #"olmo-7b",
+
+    # 32 layers
+    "olmo3-7bi-dpo",
+    "olmo3-7bi-sft",
+    "olmo3-7b",  
     
 ]
 
 setting = [
     ["mean_logit_contribs_pt-to", "logits"], 
     ["mean_rank_pt-to", "rank"],
-    ][1]
+    ][0]
 
 
 scores_m1 = [load_and_merge_scores(files_path, models[0], subtask, setting[0]) for subtask in tasks]

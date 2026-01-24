@@ -40,7 +40,7 @@ The paper's experiments and graphs can be reproduced by running the scripts unde
 From the project root directory:
 ```bash
 source .venv/bin/activate
-cd experiments
+uv run python -m experiments.[MODULE_NAME] [--ARGS]
 ```
 
 Now, the scripts can be run from the command line.
@@ -73,12 +73,12 @@ Additionally, there are some parameters that are required for specific experimen
 
 ```bash
 # 2-layer patching on Olmo-2 1B, on 100 samples from the Adjective: Comparative task
-uv run activation_patching.py --model_idx 17 --task "adjectives" --subtask "adj_comp" --num_choices 2 --num_samples 100
+uv run python -m experiments.activation_patching --model_idx 17 --task "adjectives" --subtask "adj_comp" --num_choices 2 --num_samples 100
 ```
 
 ```bash
 # 3-layer patching on Olmo-2 7B DPO, on 100 samples from the Metaphor Boolean task
-uv run activation_patching.py --model_idx 19 --task "metaphor_boolean" --num_choices 3 --num_samples 100
+uv run python -m experiments.activation_patching --model_idx 19 --task "metaphor_boolean" --num_choices 3 --num_samples 100
 ```
 
 
@@ -92,7 +92,7 @@ For conciseness, hyperparameters (models, tasks) are specified in the file direc
 Example command:
 
 ```bash
-uv run statistical_test.py
+uv run python -m experiments.statistical_test
 ```
 
 
@@ -117,7 +117,7 @@ The tasks must be specified directly in `linear_probe.py`.
 ```bash
 # Use Olmo-2 7B to create varied instruction representations (involves activation patching)
 
-uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --make_dataset
+uv run python -m experiments.linear_probe --model_idx 20 --varying "instructions" --model_component "resid_post" --make_dataset
 ```
 
 ### Run probe on the dataset:
@@ -125,7 +125,7 @@ uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component
 ```bash
 # Run probe on the Olmo-2 7B representations. The remaining args ensure that the correct dataset is loaded
 
-uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --do_probe
+uv run python -m experiments.linear_probe --model_idx 20 --varying "instructions" --model_component "resid_post" --do_probe
 ```
 
 ### Plot the clusters using LDA:
@@ -133,7 +133,7 @@ uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component
 ```bash
 # Run probe on the Olmo-2 7B representations. The remaining args ensure that the correct dataset is loaded
 
-uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --plot_lda_clusters
+uv run python -m experiments.linear_probe --model_idx 20 --varying "instructions" --model_component "resid_post" --plot_lda_clusters
 ```
 
 
@@ -146,7 +146,7 @@ uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component
 Example command:
 
 ```bash
-uv run basic_inference.py --model_idx 19 --task "animals" --subtask "can_fly" --test_batch_size 5 --max_tokens 2
+uv run python -m experiments.basic_inference --model_idx 19 --task "animals" --subtask "can_fly" --test_batch_size 5 --max_tokens 2
 ```
 
 
@@ -167,7 +167,7 @@ Tracing is only done on contrastive tasks, and both subtasks are done by default
 
 for i in $(seq 0 49);
 do
-        uv run path_tracing.py --model_idx 16 --task "adjectives" --tracing_sample_idx $i --start_pos 11 --end_pos -1 --threshold_rank 100
+        uv run python -m experiments.path_tracing --model_idx 16 --task "adjectives" --tracing_sample_idx $i --start_pos 11 --end_pos -1 --threshold_rank 100
 done
 
 ```

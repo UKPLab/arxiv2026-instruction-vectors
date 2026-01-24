@@ -122,23 +122,31 @@ def statistical_analysis(unnorm_scores, norm_scores, tasks):
 files_path = f"{PROJECT_ROOT}/experiments/output/patching_scores"
 
 tasks = [
-    "adj_ant",
-    "adj_comp",
-    "anim_color",
-    "can_fly", 
+    #"adj_ant",
+    #"adj_comp",
+    #"anim_color",
+    #"can_fly", 
+    "metaphor_boolean",
+    "implicatures",
+    "object_counting",
+    "snarks"
 ]
 
 task_names = [
-    "adjective: antonym",
-    "adjective: comparative",
-    "animal: color",
-    "animal: can_fly",
+    #"adjective: antonym",
+    #"adjective: comparative",
+    #"animal: color",
+    #"animal: can_fly",
+    "metaphor_boolean",
+    "implicatures",
+    "object_counting",
+    "snarks"
 ]
 
 models = [
-    "olmo-1b-dpo",
-    "olmo-1b-sft",
-    "olmo-1b",   
+    "olmo3-7bi-dpo",
+    "olmo3-7bi-sft",
+    "olmo3-7b",   
 ]
 
 setting = [

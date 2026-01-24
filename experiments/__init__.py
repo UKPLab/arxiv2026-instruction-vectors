@@ -11,7 +11,7 @@ from src import (
     utils,
 )
 
-from src import REPO_ROOT
+from src import PROJECT_ROOT
 
 __all__ = [
     src,
@@ -23,6 +23,6 @@ __all__ = [
     metric_utils,
     path_analysis,
     utils,
-    REPO_ROOT
+    PROJECT_ROOT
 ]
 

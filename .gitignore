@@ -142,3 +142,6 @@ output/path_analysis/*
 # Misc
 .DS_Store
 *.pt
+
+# Large files
+output/patching_scores/*
