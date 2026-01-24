@@ -21,7 +21,7 @@ from src.data.load_datasets import config, load_task
 disable_caching()
    
 
-def make_train_test(tasks, save_name, varying, model_component, layer=None):
+def make_train_test(tasks, varying, model_component, layer=None):
     """
     Make the train and test sets for the probe.
     :param layer: Optionally train on hidden states from a specific layer only
@@ -32,7 +32,7 @@ def make_train_test(tasks, save_name, varying, model_component, layer=None):
         save_path = f"hidden_state_datasets/{config.short_name}_{model_component}_{varying}_lyr_{layers[0]}/"
     else:
         layers = [l for l in range(config.n_layers)]
-        save_path = f"hidden_state_datasets/{config.short_name}_{model_component}_{varying}_{save_name}/"
+        save_path = f"hidden_state_datasets/{config.short_name}_{model_component}_{varying}/"
 
     os.makedirs(save_path, exist_ok=True)
     print("Made output dir:", save_path)
@@ -185,7 +185,7 @@ def lda_analysis(models, varying, model_component, model_size, layer=None):
         contrastive_dataset = load_from_disk(data_path)
 
         # Load bb tasks
-        bb_data_path = f"hidden_state_datasets/{model_name}_{model_component}_{varying}_bb/"
+        bb_data_path = f"hidden_state_datasets/{model_name}_{model_component}_{varying}_{lyr_suff}/"
         bb_dataset = load_from_disk(bb_data_path)
         bb_dataset = bb_dataset.remove_columns("layer")
 
@@ -235,36 +235,34 @@ def lda_analysis(models, varying, model_component, model_size, layer=None):
 if __name__ == "__main__":
 
     if config.args.make_dataset:
-        make_train_test([
+        make_train_test([ # (task, subtask)
                         ("metaphor_boolean", None),
                         ("implicatures", None),
                         ("object_counting", None),
                         ("snarks", None),
                         ],
-                        save_name="bb",
-                        varying="instructions",
+                        varying=config.args.varying,
                         model_component=config.args.model_component,
                         )
         
     elif config.args.do_probe:
-        #for layer in [0, 1, 2, 4, 7, 15]:
         for model in ["olmo-7b", "olmo-7b-sft", "olmo-7b-dpo"]:
             train_and_test_probe(
-                model_name=model, #config.short_name,
-                varying="instructions", 
+                model_name=model,
+                varying=config.args.varying,
                 model_component=config.args.model_component,
                 num_epochs=1,
-                #layer=0
+                layer=config.args.layer_for_dataset,
             )
 
-    else:
+    elif config.args.plot_lda_clusters:
         # Do LDA
         models = ["olmo-7b", "olmo-7b-sft", "olmo-7b-dpo"]
         lda_analysis(
             models=models,
-            varying="instructions", 
-            model_component="resid_post",
+            varying=config.args.varying,
+            model_component=config.args.model_component,
             model_size="7b",
-            layer=None,  
+            layer=config.args.layer_for_dataset,
         )
 

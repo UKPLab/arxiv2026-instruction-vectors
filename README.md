@@ -1,7 +1,7 @@
 # arxiv2026_instruction_vectors
 [![Arxiv](https://img.shields.io/badge/Arxiv-YYMM.NNNNN-red?style=flat-square&logo=arxiv&logoColor=white)](https://put-here-your-paper.com)
 [![License](https://img.shields.io/github/license/UKPLab/arxiv2026-instruction-vectors)](https://github.com/UKPLab/arxiv2026-instruction-vectors/blob/main/LICENSE)
-[![Python Versions](https://img.shields.io/badge/Python-3.9-blue.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![Python Versions](https://img.shields.io/badge/Python-3.13-blue.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 
 This is the accompanying code repository for the paper [Patches of Nonlinearity: Instruction Vectors in Large Language Models](https://github.com/UKPLab/arxiv2026-instruction-vectors).
 
@@ -104,9 +104,11 @@ done
 ```
 
 
-### Linear Probe and Dimensionality Reduction Experiments
+### Linear Probe and Dimensionality Reduction
 
 For our linear probe experiments, we must produce and load from a dataset of varied instructional samples. These variations of the instruction can either keep the label space constant (e.g. keep a yes/no question a yes/no question), or can change the label space (e.g. turn a yes/no question into an T/F question). 
+
+`--layer_for_dataset`: Optionally, specify a specific model layer idx to save representations from. If specified, no other layers will be done.
 
 `--varying`: 
   * `instructions` - if label space is not changed
@@ -114,18 +116,49 @@ For our linear probe experiments, we must produce and load from a dataset of var
 
 Note that in our paper, we only vary instructions, so there is a minimal selection of tasks for which a varied label space is predefined in the codebase.
 
-For our geometric analysis experiments, we must specify which dimensionality reduction method to use.
+Example commands:
 
-`--reduction_method`: 
-  * `pca`
-  * `tsne`
-  * `lda`
+**Make dataset:**
+
+The tasks must be specified directly in `linear_probe.py`.
+
+```bash
+# Use Olmo-2 7B to create varied instruction representations (involves activation patching)
+
+uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --make_dataset
+```
+
+**Run probe on the dataset:**
+
+```bash
+# Run probe on the Olmo-2 7B representations. The remaining args ensure that the correct dataset is loaded
+
+uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --do_probe
+```
+
+**Plot the clusters using LDA:**
+
+```bash
+# Run probe on the Olmo-2 7B representations. The remaining args ensure that the correct dataset is loaded
+
+uv run linear_probe.py --model_idx 20 --varying "instructions" --model_component "resid_post" --plot_lda_clusters
+```
+
+
+### Target Task Inference
+
+`--max_tokens`: Specify the max number of output tokens allowed.
+
+`--test_batch_size`: Data loader batch size.
 
 Example command:
 
 ```bash
-python -m vector_space_analysis.py --reduction_method "lda"
+
+uv run basic_inference.py --model_idx 19 --task "animals" --subtask "can_fly" --test_batch_size 5 --max_tokens 2
 ```
+
+
 
 ## Cite
 

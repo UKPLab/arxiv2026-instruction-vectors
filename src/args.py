@@ -32,5 +32,6 @@ def create_parser():
     parser.add_argument('--layer_for_dataset', type=int, default=0)
     parser.add_argument('--make_dataset', action="store_true")
     parser.add_argument('--do_probe', action="store_true")
+    parser.add_argument('--plot_lda_clusters', action="store_true")
     
     return parser
