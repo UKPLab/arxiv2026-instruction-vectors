@@ -2,8 +2,8 @@
 Script for generating heatmaps from saved multilayer patching scores.
 """
 
-from arxiv2026_instruction_vectors.graph_utils import make_mlp_heatmap
-from arxiv2026_instruction_vectors import PROJECT_ROOT
+from src.graph_utils import make_mlp_heatmap
+from src import PROJECT_ROOT
 
 import os
 

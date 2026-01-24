@@ -14,9 +14,9 @@ from nnsight import CONFIG, LanguageModel, util
 from nnsight.tracing.graph import Proxy
 from tqdm import tqdm
 
-from arxiv2026_instruction_vectors import config, PROJECT_ROOT
-from arxiv2026_instruction_vectors.data.load_datasets import load_task
-from arxiv2026_instruction_vectors.metric_utils import compute_rr
+from src import PROJECT_ROOT, config
+from src.data.load_datasets import load_task
+from src.metric_utils import compute_rr
 
 load_dotenv()
 

@@ -1,6 +1,6 @@
 import os
 import sys
-import arxiv2026_instruction_vectors.config as config
+import src.config as config
 
 # Required by nnsight
 sys.setrecursionlimit(10000)

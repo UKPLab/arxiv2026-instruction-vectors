@@ -1,5 +1,5 @@
-from arxiv2026_instruction_vectors import config, PROJECT_ROOT
-from arxiv2026_instruction_vectors.data.load_datasets import load_task, InferenceDataset
+from src import PROJECT_ROOT, config
+from src.data.load_datasets import load_task, InferenceDataset
 from collections import defaultdict
 import os
 import sys

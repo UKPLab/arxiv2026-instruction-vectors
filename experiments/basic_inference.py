@@ -7,9 +7,9 @@ from torch.utils.data import DataLoader
 from transformers import AutoTokenizer
 from vllm import LLM, SamplingParams
 
-from arxiv2026_instruction_vectors import config, PROJECT_ROOT
-from arxiv2026_instruction_vectors.data.load_datasets import InferenceDataset, load_task
-from arxiv2026_instruction_vectors.metric_utils import (
+from src import PROJECT_ROOT, config
+from src.data.load_datasets import InferenceDataset, load_task
+from src.metric_utils import (
     basic_accuracy,
     instruction_accuracy,
     judge_accuracy,

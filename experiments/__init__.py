@@ -1,6 +1,6 @@
-import arxiv2026_instruction_vectors 
+import src 
 
-from arxiv2026_instruction_vectors import (
+from src import (
     args,
     attn_tracer,
     config,
@@ -11,10 +11,10 @@ from arxiv2026_instruction_vectors import (
     utils,
 )
 
-from arxiv2026_instruction_vectors import REPO_ROOT
+from src import REPO_ROOT
 
 __all__ = [
-    arxiv2026_instruction_vectors,
+    src,
     args,
     attn_tracer,
     config,

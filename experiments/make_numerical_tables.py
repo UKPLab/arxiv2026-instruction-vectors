@@ -2,7 +2,7 @@
 Script for generating the numerical scores table for top_k tuples per task.
 """
 
-from arxiv2026_instruction_vectors.graph_utils import PROJECT_ROOT
+from src.graph_utils import PROJECT_ROOT
 import math
 import os
 import torch

@@ -1,7 +1,7 @@
 """
-Arguments and settings for the whole project
+Specify model information.
 """
-from arxiv2026_instruction_vectors.args import create_parser
+from src.args import create_parser
 
 # Set project args
 parser = create_parser()

@@ -16,7 +16,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
 
-from arxiv2026_instruction_vectors.data.load_datasets import config, load_task
+from src.data.load_datasets import config, load_task
 
 disable_caching()
    

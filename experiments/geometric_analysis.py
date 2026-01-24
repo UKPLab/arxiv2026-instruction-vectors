@@ -19,8 +19,8 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.manifold import TSNE
 from tqdm import tqdm
 
-from arxiv2026_instruction_vectors import config
-from arxiv2026_instruction_vectors.data.load_datasets import load_task
+from src import config
+from src.data.load_datasets import load_task
 
 def get_instr_states(tasks, method, varying, layerwise_graph, model_component):
     """

@@ -5,8 +5,8 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-from arxiv2026_instruction_vectors import config, PROJECT_ROOT
-from arxiv2026_instruction_vectors.graph_utils import (
+from src import PROJECT_ROOT, config
+from src.graph_utils import (
     active_heads_heatmap_tinst_only,
 )
 

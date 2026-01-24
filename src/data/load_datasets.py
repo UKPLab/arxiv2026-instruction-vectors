@@ -1,4 +1,4 @@
-from arxiv2026_instruction_vectors import config
+from src import config
 from datasets import Dataset, load_dataset, disable_caching
 import os
 import numpy as np

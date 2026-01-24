@@ -8,7 +8,7 @@ import os
 import torch
 from scipy import stats
 
-from arxiv2026_instruction_vectors import PROJECT_ROOT
+from src import PROJECT_ROOT
 
 def format_latex_pval_table(scores, t_stats, models, tasks, top_k):
     top_k_all_models = []

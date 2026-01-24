@@ -1,8 +1,8 @@
 import os
 import sys
-import arxiv2026_instruction_vectors.config as config
+import src.config as config
 from collections import defaultdict
-from arxiv2026_instruction_vectors.data.load_datasets import load_task, InferenceDataset
+from src.data.load_datasets import load_task, InferenceDataset
 
 # Required by nnsight
 sys.setrecursionlimit(10000)
