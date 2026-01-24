@@ -1,6 +1,6 @@
 # arxiv2026_instruction_vectors
 [![Arxiv](https://img.shields.io/badge/Arxiv-YYMM.NNNNN-red?style=flat-square&logo=arxiv&logoColor=white)](https://put-here-your-paper.com)
-[![License](https://img.shields.io/github/license/UKPLab/arxiv2026-instruction-vectors)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/github/license/UKPLab/arxiv2026-instruction-vectors)](https://github.com/UKPLab/arxiv2026-instruction-vectors/blob/main/LICENSE)
 [![Python Versions](https://img.shields.io/badge/Python-3.9-blue.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 
 This is the accompanying code repository for the paper [Patches of Nonlinearity: Instruction Vectors in Large Language Models](https://github.com/UKPLab/arxiv2026-instruction-vectors).
