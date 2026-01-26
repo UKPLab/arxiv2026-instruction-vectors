@@ -45,6 +45,33 @@ uv run python -m experiments.[MODULE_NAME] [--ARGS]
 
 Now, the scripts can be run from the command line.
 
+### Datasets included in the repository
+This repository contains the datasets of our *contrastive tasks*, which were automatically generated and manually verified for quality by the authors (see paper for details). The tasks are located under `src/data/local_tasks`.
+
+The tasks include:
+
+- `adjectives.csv`
+- `animals.csv`
+- `math.csv` -- *(not used in paper)*
+- `mushrooms.csv` -- *(not used in paper)*
+
+Each csv file has the following header: `query,subtask_1,subtask_2`.
+
+Additionally, we include the datasets of our instruction rephrasals. These datasets were also automatically generated and manually verified by the authors.
+
+The tasks include:
+
+- `adj_ant_rephrased.csv`
+- `adj_comp_rephrased.csv`
+- `anim_color_rephrased.csv`
+- `can_fly_rephrased.csv`
+- `implicatures_rephrased.csv`
+- `metaphor_boolean_rephrased.csv`
+- `object_counting_rephrased.csv`
+- `snarks_rephrased.csv`
+
+Each csv file has the following header: `index,instruction`.
+
 ## Running experiments
 
 Before running experiments, specify necessary hyperparameters in `args.py`.
@@ -110,7 +137,7 @@ Note that in our paper, we only vary instructions, so there is a minimal selecti
 
 Example commands:
 
-### Make dataset:
+### Make the representations dataset:
 
 The tasks must be specified directly in `linear_probe.py`.
 
@@ -173,10 +200,9 @@ done
 ```
 
 
-
 ## Cite
 
-If you found our work helpful, please cite our paper:
+If you found our data or code helpful, please cite our paper:
 
 ```
 @InProceedings{smith:20xx:CONFERENCE_TITLE,

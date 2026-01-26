@@ -1,6 +1,9 @@
 """
 Multilayer patching: Do combinatorial search for all combinations
 of 2 or 3 layers. Then input to the patching function.
+
+Determine the logit/rank contributions of the layer combinations.
+
 """
 import gc
 import os
