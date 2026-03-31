@@ -253,109 +253,105 @@ def patch_multiple_layers(combinations):
         del target_only_logits
         gc.collect()
 
-    # Get the Cartesian product of all the layers to define the graph grid
-    # Some will be nan because we don't do these combinations, or they're duplicates
-    # i.e. patching (0,1) == patching (1,0) but only (0,1) was done
-    # while we don't patch (0,0) - this is equivalent to single-layer patching
-    tuples = product([i for i in range(config.n_layers)], [i for i in range(config.n_layers)])
-    tuples = [i for i in tuples]
+
+
     
     # Save all the logit and rank contribs to not have to rerun the patching
     # setting 1 (pt vs to), targ pos 0
     unnorm_scores_1 = {tuple: [scores[0] for scores in logit_diffs_all_samples_1[tuple]] # target_pos 0
                        if tuple in logit_diffs_all_samples_1.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_scores_1 = {tuple: np.round(np.mean(
                         [scores[0] for scores in logit_diffs_all_samples_1[tuple]] # target_pos 0
                         ), 2) 
                        if tuple in logit_diffs_all_samples_1.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
 
     unnorm_ranks_1 = {tuple:[scores[0] for scores in rr_diffs_all_samples_1[tuple]] # target_pos 0
                        if tuple in rr_diffs_all_samples_1.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_ranks_1 = {tuple: np.round(np.mean(
                         [scores[0] for scores in rr_diffs_all_samples_1[tuple]] # target_pos 0
                         ), 2) 
                        if tuple in rr_diffs_all_samples_1.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     
     # setting 1 (pt vs to), targ pos 1
     unnorm_scores_2 = {tuple: [scores[1] for scores in logit_diffs_all_samples_1[tuple]] # target_pos 1
                        if tuple in logit_diffs_all_samples_1.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_scores_2 = {tuple: np.round(np.mean(
                         [scores[1] for scores in logit_diffs_all_samples_1[tuple]] # target_pos 1
                         ), 2) 
                        if tuple in logit_diffs_all_samples_1.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     
     unnorm_ranks_2 = {tuple: [scores[1] for scores in rr_diffs_all_samples_1[tuple]] # target_pos 1
                        if tuple in rr_diffs_all_samples_1.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_ranks_2 = {tuple: np.round(np.mean(
                         [scores[1] for scores in rr_diffs_all_samples_1[tuple]] # target_pos 1
                         ), 2) 
                        if tuple in rr_diffs_all_samples_1.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     
     # setting 2 (pt vs it), targ pos 0
     unnorm_scores_3 = {tuple: [scores[0] for scores in logit_diffs_all_samples_2[tuple]] # target_pos 0
                        if tuple in logit_diffs_all_samples_2.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_scores_3 = {tuple: np.round(np.mean(
                         [scores[0] for scores in logit_diffs_all_samples_2[tuple]] # target_pos 0
                         ), 2) 
                        if tuple in logit_diffs_all_samples_2.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     
     unnorm_ranks_3 = {tuple: [scores[0] for scores in rr_diffs_all_samples_2[tuple]] # target_pos 0
                        if tuple in rr_diffs_all_samples_2.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_ranks_3 = {tuple: np.round(np.mean(
                         [scores[0] for scores in rr_diffs_all_samples_2[tuple]] # target_pos 0
                         ), 2) 
                        if tuple in rr_diffs_all_samples_2.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     
     # setting 2 (pt vs it), targ pos 1
     unnorm_scores_4 = {tuple: [scores[1] for scores in logit_diffs_all_samples_2[tuple]] # target_pos 1
                        if tuple in logit_diffs_all_samples_2.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_scores_4 = {tuple: np.round(np.mean(
                         [scores[1] for scores in logit_diffs_all_samples_2[tuple]] # target_pos 1
                         ), 2) 
                        if tuple in logit_diffs_all_samples_2.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     
     unnorm_ranks_4 = {tuple: [scores[1] for scores in rr_diffs_all_samples_2[tuple]] # target_pos 1
                        if tuple in rr_diffs_all_samples_2.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_ranks_4 = {tuple: np.round(np.mean(
                         [scores[1] for scores in rr_diffs_all_samples_2[tuple]] # target_pos 1
                         ), 2) 
                        if tuple in rr_diffs_all_samples_2.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     
 
     # Save the top-k control checks
     unnorm_scores_5 = {tuple: [scores[1] for scores in logit_diffs_all_samples_3[tuple]] # target_pos 1
                        if tuple in logit_diffs_all_samples_3.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_scores_5 = {tuple: np.round(np.mean(
                         [scores[1] for scores in logit_diffs_all_samples_3[tuple]] # target_pos 1
                         ), 2) 
                        if tuple in logit_diffs_all_samples_3.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     
     unnorm_scores_6 = {tuple: [scores[1] for scores in logit_diffs_all_samples_4[tuple]] # target_pos 1
                        if tuple in logit_diffs_all_samples_4.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
     mean_scores_6 = {tuple: np.round(np.mean(
                         [scores[1] for scores in logit_diffs_all_samples_4[tuple]] # target_pos 1
                         ), 2) 
                        if tuple in logit_diffs_all_samples_4.keys() else np.nan 
-                       for tuple in tuples}
+                       for tuple in combinations}
 
 
     if config.args.num_choices == 1:
