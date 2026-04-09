@@ -10,30 +10,31 @@ from src.graph_utils import (
     active_heads_heatmap_tinst_only,
 )
 
-def save_graphing_info(task, src_token, task_dir, sample_idx, prompt_tokens, num_heads=16):
-    all_paths_by_src = {}
-    heads_df = defaultdict(list)
-    heads_df["path_idx"]
-    heads_df["path"]
-    for i in range(num_heads):
-        heads_df[f"head_{i}"]
+def save_graphing_info(src_token, task_dir, sample_idx, num_heads):
+    """
+    Collect attention head activity info for a single sample of a task.
 
-    results_dir = f"{task_dir}/{sample_idx}"
-    heads_file = f"{results_dir}/{src_token}_heads.csv"
+    A path is a tuple of "subtuples" that have the form:
+    "((-1, None, 8), (0, (tensor([True, True, True, True, True, True, True, True, True, True, True, True,
+        True, True, True, True]), True), 8)"
 
-    # Load the CSV containing the high-ranking paths
-    contribs_df = torch.load(f"{task_dir}/{sample_idx}/{src_token}.pt", weights_only=False)
-    paths = [contribs_df.loc[i]["path"] for i in range(len(contribs_df))]
-    #tok_info[token_pos][task_pair[0]].append()
-
-    paths = [contribs_df.loc[i]["path"] for i in range(len(contribs_df))]
-    all_paths_by_src[src_token] = paths
+    Return heads_info, a dict containing the %activity and %inactivity for each head at each layer.
+    The two values are trivially complementary - %inactivity can be inferred from %activity and vice versa.
+    Both are included as a sanity check of correctness.
     
-    # Gather info on which heads are consistently active/inactive within 1 path
-    activity = {layer: {f"head_{i}": [0, 0] for i in range(num_heads)} for layer in range(config.n_layers)}   # head_i: [%active, %inactive]
-
+    """    
+    all_paths_by_src_token = {}
+    src_token_path_data = torch.load(f"{task_dir}/{sample_idx}/{src_token}.pt", weights_only=False)
+    paths = [src_token_path_data.loc[i]["path"] for i in range(len(src_token_path_data))]
+    all_paths_by_src_token[src_token] = paths
     
+    heads_info = {
+        layer: {f"head_{i}": [0, 0] for i in range(num_heads)}   # head_i: [#active, #inactive]
+        for layer in range(config.n_layers)
+    }
+
     for path_idx in range(len(paths)):
+        # Read the subtuple structure of the path
         path = paths[path_idx]
         for j in range(len(path)):
             subtuple = path[j]
@@ -43,28 +44,29 @@ def save_graphing_info(task, src_token, task_dir, sample_idx, prompt_tokens, num
             for head_idx in range(num_heads):
                 head = subtuple[1][0][head_idx]            
                 if head:
-                    activity[layer][f"head_{head_idx}"][0] += 1
+                    # head is active
+                    heads_info[layer][f"head_{head_idx}"][0] += 1
                 else:
-                    activity[layer][f"head_{head_idx}"][1] += 1
+                    # head is inactive
+                    heads_info[layer][f"head_{head_idx}"][1] += 1
 
-    # Calculate the ratio of activity to inactivity for each layer-head across all subtuples&paths     
-    for layer in range(config.n_layers):       
+    # Calculate and store the activity/inactivity ratio for each head in each layer
+    num_paths = len(paths)
+    for layer in range(config.n_layers):
         for head_idx in range(num_heads):
-            head_act_task1 = activity[layer][f"head_{head_idx}"][0]
-            head_act_task2 = activity[layer][f"head_{head_idx}"][1]
+            # Retrieve counts
+            active_count = heads_info[layer][f"head_{head_idx}"][0]
+            inactive_count = heads_info[layer][f"head_{head_idx}"][1]
 
-            # Get rounded percentages
-            head_act_task1 *= (1/len(paths))
-            head_act_task2 *= (1/len(paths))
-            head_act_task1 = round(head_act_task1, 2)
-            head_act_task2 = round(head_act_task2, 2)
+            # Calculate ratio (as a percentage of paths), rounded to 2 decimals
+            active_ratio = round(active_count / num_paths, 2)
+            inactive_ratio = round(inactive_count / num_paths, 2)
 
-            activity[layer][f"head_{head_idx}"][0] = head_act_task1
-            activity[layer][f"head_{head_idx}"][1] = head_act_task2
+            # Store back in heads_info
+            heads_info[layer][f"head_{head_idx}"][0] = active_ratio
+            heads_info[layer][f"head_{head_idx}"][1] = inactive_ratio
 
-    heads_df = pd.DataFrame(heads_df)
-    heads_df.to_csv(heads_file)
-    return heads_df, activity
+    return heads_info
 
 
 model = "olmo-1b"
@@ -104,10 +106,7 @@ for sample_idx in tqdm(samples):
     except FileNotFoundError:
         continue
 
-    query_1 = prompt_tokens_1.loc[query_tok_idx, "decoded"].replace("Ġ", "")
-    query_2 = prompt_tokens_2.loc[query_tok_idx, "decoded"].replace("Ġ", "")
-
-    # Now check the output files for both tasks this query.
+    # Now for this query, check the output files for both tasks
     # Some token positions might have high-ranking paths in Task A, but not Task B - this is ok
     longest_prompt = max(len(prompt_tokens_1), len(prompt_tokens_2))
 
@@ -120,7 +119,7 @@ for sample_idx in tqdm(samples):
 
         # Does this token_pos have a file in task 1?
         if contribs_file in task_1:
-            task1_info, act_inact_ratios = save_graphing_info(task_pair[0], token_pos, task_dirs[0], sample_idx, prompt_tokens_1)
+            task1_info, act_inact_ratios = save_graphing_info(token_pos, task_dirs[0], sample_idx, num_heads)
             if task_pair[0] in tok_info[token_pos]:
                 for src_layer in tok_info[token_pos][task_pair[0]]:
                     for head in tok_info[token_pos][task_pair[0]][src_layer]:
@@ -131,7 +130,7 @@ for sample_idx in tqdm(samples):
 
         # Does this token_pos have a file in task 2?
         if contribs_file in task_2:
-            task2_info, act_inact_ratios = save_graphing_info(task_pair[1], token_pos, task_dirs[1], sample_idx, prompt_tokens_2)
+            task2_info, act_inact_ratios = save_graphing_info(token_pos, task_dirs[1], sample_idx, num_heads)
             if task_pair[1] in tok_info[token_pos]:
                 for src_layer in tok_info[token_pos][task_pair[1]]:
                     for head in tok_info[token_pos][task_pair[1]][src_layer]:
@@ -140,15 +139,17 @@ for sample_idx in tqdm(samples):
             else:
                 tok_info[token_pos][task_pair[1]] = act_inact_ratios
 
-# Average the head activity over all samples
-for token_pos in tok_info:
+
+# Average the head activity over all samples (each token position, task, layer, and head)
+for token_pos, task_dict in tok_info.items():
     for task in task_pair:
-        if task in tok_info[token_pos]:
-            for src_layer in tok_info[token_pos][task]:
-                for head in tok_info[token_pos][task][src_layer]:
-                    act_total = tok_info[token_pos][task][src_layer][head]
-                    act_perc = [round(t / len(samples), 2) for t in act_total]
-                    tok_info[token_pos][task][src_layer][head] = act_perc
+        if task not in task_dict:
+            continue
+        for src_layer, head_dict in task_dict[task].items():
+            for head, act_total in head_dict.items():
+                # act_total is a list: [active_count, inactive_count]
+                averaged = [round(count / len(samples), 2) for count in act_total]
+                tok_info[token_pos][task][src_layer][head] = averaged
 
 
 # Now, make the heatmap graph averaged over all token positions
