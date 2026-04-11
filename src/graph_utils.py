@@ -353,13 +353,10 @@ def single_query_heatmap(head_changes_all, query, decoded_tokens, model, task1, 
 
 def active_heads_heatmap_tinst_only(
         heads_info, 
-        query, 
         task_pair, 
         longest_prompt,
         prompt_1, 
         prompt_2, 
-        model,
-        sample_idx,
         num_heads, 
         num_layers, 
         save_path
@@ -410,9 +407,9 @@ def active_heads_heatmap_tinst_only(
 
             prompt = prompt_pair[col_idx]
             try:
-                decoded_token = prompt[token_idx]
+                decoded_token = prompt["decoded"].iloc[token_idx]
                 data_one_task = np.array(both_tasks_per_token[token_idx][col_idx])
-                data_one_task = data_one_task[:, :, 0]   # slice idx 0 to just get the activity % (inactivty at idx 1 follows trivially)
+
 
                 # Reverse the presentation order of heads to make the heatmap axes more readable
                 # This doesn't change the data itself
@@ -498,9 +495,9 @@ def active_heads_heatmap(
         for col_idx in range(axs.shape[1]):
             prompt = prompt_pair[col_idx]
             try:
-                decoded_token = prompt[token_idx]
+                decoded_token = prompt["decoded"].iloc[token_idx]
                 data_one_task = np.array(both_tasks_per_token[token_idx][col_idx])
-                data_one_task = data_one_task[:, :, 0]   # slice idx 0 to just get the activity % (inactivty at idx 1 follows trivially)
+
 
                 # Reverse the presentation order of heads to make the heatmap axes more readable
                 # This doesn't change the data itself
@@ -529,6 +526,116 @@ def active_heads_heatmap(
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     fig.subplots_adjust(hspace=0.3, wspace=0, right=0.2)
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    print("Fig saved to:", save_path)
+    return
+
+
+def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title, save_path,
+                             token_positions=None):
+    """
+    Plot mean head activity (and optionally 95% CI width) for both tasks in task_pair.
+
+    Args:
+        task_info:       When token_positions is provided: the full tok_info dict,
+                           i.e. tok_info[token_pos][task][layer][head_key] = float or dict.
+                         When token_positions is None: already sliced to task level,
+                           i.e. {task: {layer: {head_key: float or dict}}}.
+        task_pair:       List of two task names to show as columns.
+        token_positions: Optional dict mapping task name → token_pos to display,
+                           e.g. {task_pair[0]: 8, task_pair[1]: 10}.
+                         When None, task_info is used as-is (no token_pos slicing).
+        title:           Figure suptitle.
+    """
+    layers = list(range(num_layers))
+    heads = list(reversed(range(num_heads)))
+
+    def _get_layer_data(task):
+        if task in task_info:
+            return task_info[task]
+        return task_info[token_positions[task]][task]
+
+    # Detect which optional panels are available
+    sample_val = _get_layer_data(task_pair[0])[0]["head_0"]
+    has_ci = isinstance(sample_val, dict)
+    has_pvalue = has_ci and any(
+        _get_layer_data(task)[layer][f"head_{head_idx}"].get("var_pvalue") is not None
+        for task in task_pair
+        for layer in range(num_layers)
+        for head_idx in range(num_heads)
+    )
+
+    n_rows = (1 + int(has_ci) + int(has_pvalue))
+    fig, axs = plt.subplots(n_rows, 2, figsize=(14, 6 * n_rows), squeeze=False)
+
+    ci_max = 0.0
+    matrices = {}
+    for task in task_pair:
+        layer_data = _get_layer_data(task)
+        mean_mat     = np.zeros((num_layers, num_heads))
+        ci_width_mat = np.zeros((num_layers, num_heads))
+        pvalue_mat   = np.full((num_layers, num_heads), np.nan)
+        for layer in layers:
+            for head_idx in range(num_heads):
+                val = layer_data[layer][f"head_{head_idx}"]
+                if has_ci:
+                    mean_mat[layer, head_idx] = val["mean"] or 0.0
+                    if val["ci_lower"] is not None and val["ci_upper"] is not None:
+                        ci_width_mat[layer, head_idx] = val["ci_upper"] - val["ci_lower"]
+                    if has_pvalue and val.get("var_pvalue") is not None:
+                        # -log10(p): higher = more significant departure from noise
+                        pvalue_mat[layer, head_idx] = -np.log10(max(val["var_pvalue"], 1e-10))
+                else:
+                    mean_mat[layer, head_idx] = val or 0.0
+        # Reverse head axis to match existing heatmap convention
+        matrices[task] = {
+            "mean":     np.flip(mean_mat, axis=1),
+            "ci_width": np.flip(ci_width_mat, axis=1),
+            "pvalue":   np.flip(pvalue_mat, axis=1),
+        }
+        ci_max = max(ci_max, matrices[task]["ci_width"].max())
+
+    for col_idx, task in enumerate(task_pair):
+        tok_label = f" (token_pos={token_positions[task]})" if token_positions else ""
+        row = 0
+
+        im_mean = axs[row, col_idx].imshow(
+            matrices[task]["mean"],
+            cmap=mpl.colormaps["RdPu"],
+            norm=mpl.colors.Normalize(vmin=0, vmax=1),
+        )
+        fig.colorbar(im_mean, ax=axs[row, col_idx], fraction=0.046, pad=0.04)
+        axs[row, col_idx].set_title(f"{task}{tok_label}\nMean activity")
+
+        if has_ci:
+            row += 1
+            im_ci = axs[row, col_idx].imshow(
+                matrices[task]["ci_width"],
+                cmap=mpl.colormaps["YlOrBr"],
+                norm=mpl.colors.Normalize(vmin=0, vmax=ci_max or 1),
+            )
+            fig.colorbar(im_ci, ax=axs[row, col_idx], fraction=0.046, pad=0.04)
+            axs[row, col_idx].set_title(f"{task}{tok_label}\n95% CI width (uncertainty)")
+
+        if has_pvalue:
+            row += 1
+            pv = matrices[task]["pvalue"]
+            im_pv = axs[row, col_idx].imshow(
+                pv,
+                cmap=mpl.colormaps["hot_r"],
+                norm=mpl.colors.Normalize(vmin=0, vmax=np.nanmax(pv) or 1),
+            )
+            fig.colorbar(im_pv, ax=axs[row, col_idx], fraction=0.046, pad=0.04)
+            axs[row, col_idx].set_title(f"{task}{tok_label}\n-log₁₀(p) variance vs noise")
+
+    for ax in axs.flat:
+        ax.set_yticks(range(num_layers), labels=layers)
+        ax.set_xticks(range(num_heads), labels=heads)
+        ax.set_xlabel("Heads")
+        ax.set_ylabel("Layers")
+
+    fig.suptitle(title)
+    fig.tight_layout()
+    plt.savefig(save_path, dpi=200, bbox_inches="tight")
     print("Fig saved to:", save_path)
     return
 
