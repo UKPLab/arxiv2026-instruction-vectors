@@ -531,7 +531,9 @@ def active_heads_heatmap(
 
 
 def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title, save_path,
-                             token_positions=None):
+                             token_positions=None,
+                             interesting_pvalue_threshold=0.05,
+                             interesting_boundary_margin=0.1):
     """
     Plot mean head activity (and optionally 95% CI width) for both tasks in task_pair.
 
@@ -583,20 +585,40 @@ def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title,
                         ci_width_mat[layer, head_idx] = val["ci_upper"] - val["ci_lower"]
                     if has_pvalue and val.get("var_pvalue") is not None:
                         # -log10(p): higher = more significant departure from noise
-                        pvalue_mat[layer, head_idx] = -np.log10(max(val["var_pvalue"], 1e-10))
+                        #pvalue_mat[layer, head_idx] = -np.log10(max(val["var_pvalue"], 1e-10))
+                        pvalue_mat[layer, head_idx] = val["var_pvalue"]
                 else:
                     mean_mat[layer, head_idx] = val or 0.0
+                    
+        # Interesting heads: p near 0 but mean_rate not near the 0/1 boundary
+        # (boundary-proximate heads produce p≈0 as a test artifact, not signal)
+        interesting_mask = (
+            (pvalue_mat < interesting_pvalue_threshold) &
+            (mean_mat > interesting_boundary_margin) &
+            (mean_mat < 1 - interesting_boundary_margin)
+        )
         # Reverse head axis to match existing heatmap convention
         matrices[task] = {
-            "mean":     np.flip(mean_mat, axis=1),
-            "ci_width": np.flip(ci_width_mat, axis=1),
-            "pvalue":   np.flip(pvalue_mat, axis=1),
+            "mean":      np.flip(mean_mat, axis=1),
+            "ci_width":  np.flip(ci_width_mat, axis=1),
+            "pvalue":    np.flip(pvalue_mat, axis=1),
+            "interesting": np.flip(interesting_mask, axis=1),
         }
         ci_max = max(ci_max, matrices[task]["ci_width"].max())
+
+    legend_label = f"★ p<{interesting_pvalue_threshold}, mean ∈ ({interesting_boundary_margin}, {1 - interesting_boundary_margin})"
+
+    def _overlay_interesting(ax, task, show_legend):
+        ys, xs = np.where(matrices[task]["interesting"])
+        ax.scatter(xs, ys, marker="*", s=80, color="cyan", zorder=5, linewidths=0,
+                   label=legend_label)
+        if show_legend and ys.size > 0:
+            ax.legend(loc="upper right", fontsize=7, framealpha=0.7)
 
     for col_idx, task in enumerate(task_pair):
         tok_label = f" (token_pos={token_positions[task]})" if token_positions else ""
         row = 0
+        show_legend = (col_idx == 0)  # only label once, on the left column
 
         im_mean = axs[row, col_idx].imshow(
             matrices[task]["mean"],
@@ -604,6 +626,8 @@ def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title,
             norm=mpl.colors.Normalize(vmin=0, vmax=1),
         )
         fig.colorbar(im_mean, ax=axs[row, col_idx], fraction=0.046, pad=0.04)
+        if has_pvalue:
+            _overlay_interesting(axs[row, col_idx], task, show_legend)
         axs[row, col_idx].set_title(f"{task}{tok_label}\nMean activity")
 
         if has_ci:
@@ -614,6 +638,8 @@ def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title,
                 norm=mpl.colors.Normalize(vmin=0, vmax=ci_max or 1),
             )
             fig.colorbar(im_ci, ax=axs[row, col_idx], fraction=0.046, pad=0.04)
+            if has_pvalue:
+                _overlay_interesting(axs[row, col_idx], task, False)
             axs[row, col_idx].set_title(f"{task}{tok_label}\n95% CI width (uncertainty)")
 
         if has_pvalue:
@@ -621,11 +647,12 @@ def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title,
             pv = matrices[task]["pvalue"]
             im_pv = axs[row, col_idx].imshow(
                 pv,
-                cmap=mpl.colormaps["hot_r"],
+                cmap=mpl.colormaps["copper_r"],
                 norm=mpl.colors.Normalize(vmin=0, vmax=np.nanmax(pv) or 1),
             )
             fig.colorbar(im_pv, ax=axs[row, col_idx], fraction=0.046, pad=0.04)
-            axs[row, col_idx].set_title(f"{task}{tok_label}\n-log₁₀(p) variance vs noise")
+            _overlay_interesting(axs[row, col_idx], task, False)
+            axs[row, col_idx].set_title(f"{task}{tok_label}\np-value: variance vs noise")
 
     for ax in axs.flat:
         ax.set_yticks(range(num_layers), labels=layers)
@@ -633,7 +660,7 @@ def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title,
         ax.set_xlabel("Heads")
         ax.set_ylabel("Layers")
 
-    fig.suptitle(title)
+    #fig.suptitle(title)
     fig.tight_layout()
     plt.savefig(save_path, dpi=200, bbox_inches="tight")
     print("Fig saved to:", save_path)
@@ -660,4 +687,111 @@ def make_scatter(data_all_samples, save_path, title, reduction_method="pca"):
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
     print("Fig saved to:", save_path)
 
+    return
+
+
+def head_k_correlation_plot(
+    comparisons,
+    task_pair,
+    num_heads,
+    num_layers,
+    title,
+    save_path,
+    k1=1,
+    k2=2,
+):
+    """
+    Visualize how strongly each head/layer's activity profile correlates between two
+    k values, for each task.
+
+    Row 0: grouped bar chart of Spearman r per head (one bar-group per head, one bar
+           per task). High r = head's activity pattern across layers is stable.
+    Row 1: grouped bar chart of Spearman r per layer (one bar-group per layer).
+    Row 2: per-task diff heatmaps (activity at k2 minus k1).
+
+    Args:
+        comparisons: dict mapping task_name -> output of compare_heatmaps(), i.e.
+                     {task: {"spearman_per_head": [...], "spearman_per_layer": [...],
+                             "diff_heatmap": np.ndarray, ...}}
+        task_pair:   ordered list of task names (must be keys in comparisons)
+        num_heads:   number of attention heads
+        num_layers:  number of layers
+        title:       figure suptitle
+        save_path:   output file path
+        k1, k2:      k values that were compared (used in labels only)
+    """
+    task_colors = ["#C72FB5", "#2F00CA", "#45BC96", "#E2CE5B"]
+    n_tasks = len(task_pair)
+    bar_width = 0.8 / n_tasks
+
+    fig = plt.figure(figsize=(max(12, 5 * n_tasks), 18))
+    gs = fig.add_gridspec(
+        3, n_tasks,
+        height_ratios=[1, 1, 1.4],
+        hspace=0.5, wspace=0.45,
+    )
+
+    def _bar_chart(ax, values_by_task, x_ticks, xlabel, title_str):
+        x = np.arange(len(x_ticks))
+        for t_idx, task in enumerate(task_pair):
+            r_vals = values_by_task[task]
+            r_display = [v if not np.isnan(v) else 0.0 for v in r_vals]
+            offset = (t_idx - (n_tasks - 1) / 2) * bar_width
+            ax.bar(
+                x + offset, r_display, width=bar_width,
+                label=task, color=task_colors[t_idx % len(task_colors)],
+                edgecolor="black", linewidth=0.4,
+            )
+        ax.axhline(0, color="gray", linewidth=0.8, linestyle="--")
+        ax.set_xticks(x)
+        ax.set_xticklabels([str(t) for t in x_ticks])
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(f"Spearman r  (k={k1} vs k={k2})")
+        ax.set_ylim(-1.05, 1.05)
+        ax.yaxis.grid(True, linestyle="--", alpha=0.35)
+        ax.set_title(title_str)
+        ax.legend(loc="lower right", fontsize=9)
+
+    # ── Row 0: Spearman r per head ────────────────────────────────────────────
+    ax_head = fig.add_subplot(gs[0, :])
+    _bar_chart(
+        ax_head,
+        {task: comparisons[task]["spearman_per_head"] for task in task_pair},
+        x_ticks=range(num_heads),
+        xlabel="Head index",
+        title_str=f"Per-head Spearman r  (k={k1} vs k={k2})",
+    )
+
+    # ── Row 1: Spearman r per layer ───────────────────────────────────────────
+    ax_layer = fig.add_subplot(gs[1, :])
+    _bar_chart(
+        ax_layer,
+        {task: comparisons[task]["spearman_per_layer"] for task in task_pair},
+        x_ticks=range(num_layers),
+        xlabel="Layer index",
+        title_str=f"Per-layer Spearman r  (k={k1} vs k={k2})",
+    )
+
+    # ── Row 2: diff heatmaps per task ─────────────────────────────────────────
+    layers = list(range(num_layers))
+    reversed_heads = list(reversed(range(num_heads)))
+
+    all_diffs = np.concatenate([comparisons[t]["diff_heatmap"].flatten() for t in task_pair])
+    vmax = max(abs(float(all_diffs.min())), abs(float(all_diffs.max())), 1e-6)
+    norm = mpl.colors.TwoSlopeNorm(vmin=-vmax, vcenter=0.0, vmax=vmax)
+
+    for t_idx, task in enumerate(task_pair):
+        ax = fig.add_subplot(gs[2, t_idx])
+        diff_mat = np.flip(comparisons[task]["diff_heatmap"], axis=1)
+        im = ax.imshow(diff_mat, cmap="RdBu_r", norm=norm)
+        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+        ax.set_title(f"{task}\nActivity diff  (k={k2} − k={k1})")
+        ax.set_yticks(range(num_layers), labels=layers)
+        ax.set_xticks(range(num_heads), labels=reversed_heads)
+        ax.set_xlabel("Heads")
+        ax.set_ylabel("Layers")
+
+    fig.suptitle(title, y=1.01, fontsize=13)
+    plt.savefig(save_path, dpi=200, bbox_inches="tight")
+    print("Fig saved to:", save_path)
     return
