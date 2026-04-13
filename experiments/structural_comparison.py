@@ -9,46 +9,22 @@ from tqdm import tqdm
 
 from src import PROJECT_ROOT
 from src.graph_utils import (
-    active_heads_heatmap_tinst_only,
     head_activity_ci_heatmap,
     head_k_correlation_plot,
 )
+from src.latex_utils import comparisons_to_latex
 
 
-def head_activity_with_conf(src_token, task_dir, sample_idx, num_heads, num_layers):
+def get_head_activity_rate_for_sample(src_token, task_dir, sample_idx, num_heads, num_layers):
     """
-    Collect attention head activity info for a single sample of a task,
-    and compute Bayesian credible intervals for each head.
+    Collect head activity info across all paths for a single sample of a task.
 
     Returns:
         heads_info[layer][head] = {
-            "mean": float,
-            "ci_lower": float,
-            "ci_upper": float,
+            "rate_active": float,  -> count_active / count_total
             "count_active": int,
             "count_total": int
         }
-
-    
-    A path consists of sub-tuples of the following form (layer_idx, (attention_mask, include_skip), next_token)
-    Example:
-    "((-1, None, 7), (0, (tensor([False, False, False, False, False, False, False,  True,  True, False,
-        False,  True, False,  True,  True, False]), True), 7), (1, (tensor([False, False, False, False, False, False, False, False, False, False,
-        False, False, False, False, False,  True]), False), 10), (2, (tensor([False, False, False, False, False, False, False, False, False, False,
-        False, False, False, False, False, False]), True), 10), (3, (tensor([False, False, False, False, False, False, False, False, False, False,
-        False, False, False, False, False, False]), True), 10), (4, (tensor([False, False, False, False,  True, False, False, False, False, False,
-        False,  True, False, False, False, False]), False), 11), (5, (tensor([False, False, False, False, False, False, False, False, False, False,
-        False, False, False, False, False, False]), True), 11), (6, (tensor([False, False, False,  True, False, False, False, False, False, False,
-        False, False, False, False, False, False]), True), 11), (7, (tensor([False, False, False, False, False, False, False, False, False, False,
-        False, False, False, False, False, False]), True), 11), (8, (tensor([False, False, False, False, False,  True, False, False, False, False,
-        False, False, False, False, False, False]), True), 11), (9, (tensor([False, False, False, False, False, False, False, False, False,  True,
-        False, False, False, False, False, False]), True), 11), (10, (tensor([ True,  True, False, False, False, False, False, False, False, False,
-         True, False, False,  True, False, False]), False), 12), (11, (tensor([False, False, False,  True, False,  True, False, False, False, False,
-        False, False, False, False, False,  True]), False), 15), (12, (tensor([False, False, False, False, False, False, False, False, False, False,
-        False, False, False, False, False, False]), True), 15), (13, (tensor([False,  True, False, False, False, False, False, False, False, False,
-        False, False, False, False, False, False]), True), 15), (14, (tensor([False, False, False, False, False, False, False, False, False, False,
-        False, False, False, False, False, False]), True), 15), (15, (tensor([ True, False, False,  True, False, False, False, False,  True, False,
-        False, False,  True, False, False, False]), True), 15))"
     """
 
     all_paths_by_src_token = {}
@@ -77,40 +53,30 @@ def head_activity_with_conf(src_token, task_dir, sample_idx, num_heads, num_laye
                 else:
                     heads_info[layer][f"head_{head_idx}"]["inactive"] += 1
 
-    # Convert counts to Bayesian stats
     for layer in range(num_layers):
         for head_idx in range(num_heads):
             head_key = f"head_{head_idx}"
-            active = heads_info[layer][head_key]["active"]
-            inactive = heads_info[layer][head_key]["inactive"]
+            count_active = heads_info[layer][head_key]["active"]
+            count_inactive = heads_info[layer][head_key]["inactive"]
 
-            n = active + inactive
+            count_total = count_active + count_inactive
 
             # Avoid division issues if something is empty
-            if n == 0:
+            if count_total == 0:
                 heads_info[layer][head_key] = {
                     "mean": None,
-                    "ci_lower": None,
-                    "ci_upper": None,
                     "count_active": 0,
                     "count_total": 0,
                 }
                 continue
 
-            # Beta posterior (uniform prior)
-            a = active + 1
-            b = inactive + 1
-
-            lower = beta_dist.ppf(0.025, a, b)
-            upper = beta_dist.ppf(0.975, a, b)
-            mean = a / (a + b)
+            rate_active = count_active / count_total
 
             heads_info[layer][head_key] = {
-                "mean": float(mean),
-                "ci_lower": float(lower),
-                "ci_upper": float(upper),
-                "count_active": active,
-                "count_total": n,
+                "rate_active": float(rate_active),
+                "count_active": count_active,
+                "count_inactive": count_inactive,
+                "count_total": count_total,
             }
 
     return heads_info
@@ -125,11 +91,13 @@ def bootstrap_head_activity(
         n_bootstrap=10000,
     ):
     """
-    Collect per-sample activity rates for each (layer, head), compute bootstrapped
-    CIs for the mean, and test whether the variance across samples is consistent
+    Determine whether the head activity for a single sample is significanty different from noise.
+
+    First collect per-sample activity rates for each (layer, head), compute bootstrapped
+    CIs for the mean, then test whether the variance across samples is consistent
     with Gaussian noise via a chi-squared variance test.
 
-    With N=100 samples (>30), CLT justifies modelling the activity rates as i.i.d.
+    With N=100 samples (>30), the Central Limit Theorem justifies modelling the activity rates as i.i.d.
     Gaussian, making the chi-squared variance test exact. The null variance is
     p*(1-p) / mean(n_obs_i): the Gaussian approximation to the variance of a sample
     proportion, using the mean observation count as the effective sample size.
@@ -157,8 +125,6 @@ def bootstrap_head_activity(
         layer: {f"head_{i}": [] for i in range(num_heads)}
         for layer in range(num_layers)
     }
-
-    print("TASK DIR:", task_dir)
 
     for sample_idx in samples:
         pt_path = f"{task_dir}/{sample_idx}/{src_token}.pt"
@@ -213,7 +179,7 @@ def bootstrap_head_activity(
 
             active_rates = np.array([e[0] for e in entries])
             num_observations_array = np.array([e[1] for e in entries])
-            N = len(active_rates)  # number of samples for which that head was observed (should be len(samples))
+            N = len(active_rates)  # number of samples for which that head was observed ( = len(samples))
             mean_rate = float(active_rates.mean())
 
             # Bootstrap CI for the mean
@@ -226,7 +192,7 @@ def bootstrap_head_activity(
 
             # Chi-squared variance test against Gaussian null:
             # model r_i ~ N(p, σ²_null) where σ²_null = p*(1-p) / mean(n_obs_i)
-            # (N-1)*S² / σ²_null ~ χ²(N-1) exactly for Gaussian data; valid here by CLT
+            # (N-1)*S² / σ²_null ~ χ²(N-1) exactly for Gaussian data; valid here by Central Limit Theorem
             var_pvalue = None
             if N >= 2:
                 null_var = mean_rate * (1 - mean_rate) / np.mean(num_observations_array)
@@ -250,7 +216,7 @@ def bootstrap_head_activity(
 
 def compare_heatmaps(heatmap_k1, heatmap_k2, num_heads, num_layers, activity_threshold=0.3):
     """
-    Compare two averaged activity heatmaps, e.g. from k=1 vs k=2.
+    Compare two mean activity rate heatmaps, e.g. from k=1 vs k=2.
 
     Each heatmap has the structure: heatmap[layer][head_key] = float (mean activity in [0, 1]),
     matching the format of tok_info[token_pos][task] after averaging over samples.
@@ -306,163 +272,12 @@ def compare_heatmaps(heatmap_k1, heatmap_k2, num_heads, num_layers, activity_thr
     }
 
 
-def comparisons_to_latex(
-    all_comparisons,
-    models,
-    task,
-    num_heads,
-    num_layers,
-    float_fmt=".2f",
-    save_path=None,
-):
-    """
-    Render compare_heatmaps results for a single task across multiple models as a
-    LaTeX booktabs table. One row per model.
-
-    Columns: spearman_overall, jaccard, spearman_per_layer, spearman_per_head,
-             diff_heatmap (as a row-per-layer block of values).
-
-    Requires LaTeX packages: booktabs, makecell, array.
-    The diff_heatmap column is wide; wrap the table in a sidewaystable (rotating
-    package) or \resizebox{\textwidth}{!}{...} for best results.
-
-    Args:
-        all_comparisons: {model_name: output of compare_heatmaps()}
-        models:          ordered list of model names (determines row order)
-        task:            task name used in the caption and label
-        num_heads:       number of attention heads
-        num_layers:      number of layers
-        float_fmt:       Python format spec for float values (default ".2f")
-        save_path:       if given, write the .tex snippet to this path
-
-    Returns:
-        str: LaTeX table source
-    """
-    def fmt(v):
-        if v is None or (isinstance(v, float) and np.isnan(v)):
-            return "--"
-        return format(float(v), float_fmt)
-
-    def fmt_list(lst):
-        # Plain text — placed directly in a p{} column so it wraps at commas
-        return r"{\scriptsize [" + ", ".join(fmt(v) for v in lst) + r"]}"
-
-    def fmt_matrix(mat):
-        # Nested tabular: & between columns, \\ between rows — values align
-        row_strs = [" & ".join(fmt(v) for v in row) for row in mat]
-        return (
-            r"{\tiny\begin{tabular}[t]{@{}*{"
-            + str(num_heads)
-            + r"}{r}@{}}"
-            + r" \\ ".join(row_strs)
-            + r"\end{tabular}}"
-        )
-
-    col_spec = r"l c c p{5.5cm} p{5.5cm} p{9cm}"
-    header = " & ".join([
-        r"\textbf{Model}",
-        r"$r_{\text{overall}}$",
-        r"Jaccard",
-        r"$r_{\text{per-layer}}$ {\scriptsize (layers 0--" + str(num_layers - 1) + ")}",
-        r"$r_{\text{per-head}}$ {\scriptsize (heads 0--" + str(num_heads - 1) + ")}",
-        r"Diff heatmap ($k_2 - k_1$, rows = layers)",
-    ]) + r" \\"
-
-    rows = []
-    for model in models:
-        cmp = all_comparisons.get(model)
-        if cmp is None:
-            continue
-        cells = [
-            model.replace("_", r"\_"),
-            fmt(cmp["spearman_overall"]),
-            fmt(cmp["jaccard"]),
-            fmt_list(cmp["spearman_per_layer"]),
-            fmt_list(cmp["spearman_per_head"]),
-            fmt_matrix(cmp["diff_heatmap"]),
-        ]
-        rows.append(" & ".join(cells) + r" \\")
-
-    safe_task = task.replace("_", "-")
-    lines = [
-        r"\begin{table}[h]",
-        r"\centering",
-        r"\begin{tabular}{" + col_spec + "}",
-        r"\toprule",
-        header,
-        r"\midrule",
-        *rows,
-        r"\bottomrule",
-        r"\end{tabular}",
-        r"\caption{Structural comparison (k=1 vs k=2) across models --- task: " + safe_task + "}",
-        r"\label{tab:structural-comparison-" + safe_task + "}",
-        r"\end{table}",
-    ]
-
-    latex = "\n".join(lines)
-
-    if save_path:
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        with open(save_path, "w") as f:
-            f.write(latex)
-        print(f"LaTeX table saved to: {save_path}")
-
-    # ── Per-layer and per-head individual tables ───────────────────────────────
-    def _index_table(metric_key, index_label, caption_str, label_str):
-        n_cols = len(next(iter(all_comparisons.values()))[metric_key])
-        index_rows = []
-        for model in models:
-            cmp = all_comparisons.get(model)
-            if cmp is None:
-                continue
-            vals = " & ".join(fmt(v) for v in cmp[metric_key])
-            index_rows.append(model.replace("_", r"\_") + " & " + vals + r" \\")
-        return "\n".join([
-            r"\begin{table}[h]",
-            r"\centering",
-            r"\begin{tabular}{l *{" + str(n_cols) + r"}{r}}",
-            r"\toprule",
-            r"\textbf{Model} & \multicolumn{" + str(n_cols) + r"}{c}{" + index_label + r"} \\",
-            r" & " + " & ".join(str(i) for i in range(n_cols)) + r" \\",
-            r"\midrule",
-            *index_rows,
-            r"\bottomrule",
-            r"\end{tabular}",
-            r"\caption{" + caption_str + " --- task: " + safe_task + "}",
-            r"\label{" + label_str + "-" + safe_task + "}",
-            r"\end{table}",
-        ])
-
-    latex_per_layer = _index_table(
-        "spearman_per_layer",
-        r"Spearman $r$ per layer (k=1 vs k=2)",
-        r"Per-layer Spearman $r$ (k=1 vs k=2)",
-        r"tab:per-layer",
-    )
-    latex_per_head = _index_table(
-        "spearman_per_head",
-        r"Spearman $r$ per head (k=1 vs k=2)",
-        r"Per-head Spearman $r$ (k=1 vs k=2)",
-        r"tab:per-head",
-    )
-
-    if save_path:
-        base = save_path.replace("_comparison.tex", "")
-        for suffix, content in [("_per_layer.tex", latex_per_layer), ("_per_head.tex", latex_per_head)]:
-            path = base + suffix
-            with open(path, "w") as f:
-                f.write(content)
-            print(f"LaTeX table saved to: {path}")
-
-    return latex
-
-
-def get_head_activity_per_token(k, task_pair, model_dir, samples, num_heads, num_layers):
+def mean_activity_rate_per_token(k, task_pair, model_dir, samples, num_heads, num_layers):
     """
     Accumulate and average head activity info over all samples for a given k.
 
     Returns:
-        tok_info:        defaultdict — tok_info[token_pos][task][layer][head_key] = mean activity
+        tok_info:        defaultdict — tok_info[token_pos][task][layer][head_key] = mean activity rate
         prompt_tokens_1: DataFrame for the first task's prompt tokens (last valid sample)
         prompt_tokens_2: DataFrame for the second task's prompt tokens (last valid sample)
         len_longest:     length of the longest prompt seen across all samples
@@ -497,13 +312,14 @@ def get_head_activity_per_token(k, task_pair, model_dir, samples, num_heads, num
             contribs_file = f"{token_pos}.pt"
 
             if contribs_file in task_1:
-                heads_info = head_activity_with_conf(token_pos, task_dirs[0], sample_idx, num_heads, num_layers)
+                heads_info = get_head_activity_rate_for_sample(token_pos, task_dirs[0], sample_idx, num_heads, num_layers)
                 if task_pair[0] in tok_info[token_pos]:
                     for src_layer in tok_info[token_pos][task_pair[0]]:
                         for head in tok_info[token_pos][task_pair[0]][src_layer]:
-                            mean = heads_info[src_layer][head]["mean"]
-                            if mean is not None:
-                                tok_info[token_pos][task_pair[0]][src_layer][head] += mean
+                            # Take the head's mean activity
+                            active_rate = heads_info[src_layer][head]["rate_active"]
+                            if active_rate is not None:
+                                tok_info[token_pos][task_pair[0]][src_layer][head] += active_rate
                 else:
                     tok_info[token_pos][task_pair[0]] = {
                         layer: {head_key: (heads_info[layer][head_key]["mean"] or 0) for head_key in heads_info[layer]}
@@ -511,13 +327,14 @@ def get_head_activity_per_token(k, task_pair, model_dir, samples, num_heads, num
                     }
 
             if contribs_file in task_2:
-                heads_info = head_activity_with_conf(token_pos, task_dirs[1], sample_idx, num_heads, num_layers)
+                heads_info = get_head_activity_rate_for_sample(token_pos, task_dirs[1], sample_idx, num_heads, num_layers)
                 if task_pair[1] in tok_info[token_pos]:
                     for src_layer in tok_info[token_pos][task_pair[1]]:
                         for head in tok_info[token_pos][task_pair[1]][src_layer]:
-                            mean = heads_info[src_layer][head]["mean"]
-                            if mean is not None:
-                                tok_info[token_pos][task_pair[1]][src_layer][head] += mean
+                            # Take the head's mean activity
+                            active_rate = heads_info[src_layer][head]["rate_active"]
+                            if active_rate is not None:
+                                tok_info[token_pos][task_pair[1]][src_layer][head] += active_rate
                 else:
                     tok_info[token_pos][task_pair[1]] = {
                         layer: {head_key: (heads_info[layer][head_key]["mean"] or 0) for head_key in heads_info[layer]}
@@ -558,10 +375,10 @@ all_model_comparisons = {model: {} for model in models}
 for model in models:
     model_dir = f"{PROJECT_ROOT}/experiments/output/path_analysis/{model}"
 
-    tok_info_k1, _, _, _ = get_head_activity_per_token(
+    tok_info_k1, _, _, _ = mean_activity_rate_per_token(
         k=1, task_pair=task_pair, model_dir=model_dir, samples=samples, num_heads=num_heads, num_layers=num_layers
     )
-    tok_info_k2, _, _, _ = get_head_activity_per_token(
+    tok_info_k2, _, _, _ = mean_activity_rate_per_token(
         k=2, task_pair=task_pair, model_dir=model_dir, samples=samples, num_heads=num_heads, num_layers=num_layers
     )
     comparisons = {}
