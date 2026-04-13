@@ -1,3 +1,6 @@
+import numpy as np
+import os
+
 def comparisons_to_latex(
     all_comparisons,
     models,
