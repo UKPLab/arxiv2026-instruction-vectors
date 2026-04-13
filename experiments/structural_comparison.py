@@ -4,7 +4,7 @@ from collections import defaultdict
 import pandas as pd
 import torch
 import numpy as np
-from scipy.stats import beta as beta_dist, spearmanr, chi2 as chi2_dist
+from scipy.stats import spearmanr, chi2 as chi2_dist
 from tqdm import tqdm
 
 from src import PROJECT_ROOT
