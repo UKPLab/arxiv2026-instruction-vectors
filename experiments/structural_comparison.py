@@ -322,7 +322,7 @@ def mean_activity_rate_per_token(k, task_pair, model_dir, samples, num_heads, nu
                                 tok_info[token_pos][task_pair[0]][src_layer][head] += active_rate
                 else:
                     tok_info[token_pos][task_pair[0]] = {
-                        layer: {head_key: (heads_info[layer][head_key]["mean"] or 0) for head_key in heads_info[layer]}
+                        layer: {head_key: (heads_info[layer][head_key]["rate_active"] or 0) for head_key in heads_info[layer]}
                         for layer in heads_info
                     }
 
@@ -337,7 +337,7 @@ def mean_activity_rate_per_token(k, task_pair, model_dir, samples, num_heads, nu
                                 tok_info[token_pos][task_pair[1]][src_layer][head] += active_rate
                 else:
                     tok_info[token_pos][task_pair[1]] = {
-                        layer: {head_key: (heads_info[layer][head_key]["mean"] or 0) for head_key in heads_info[layer]}
+                        layer: {head_key: (heads_info[layer][head_key]["rate_active"] or 0) for head_key in heads_info[layer]}
                         for layer in heads_info
                     }
 
