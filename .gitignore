@@ -141,6 +141,7 @@ arxiv2026_instruction_vectors/sketch*
 # Misc
 **.DS_Store
 *.pt
+*.tex
 
 # Large files
 experiments/output/patching_scores/*
