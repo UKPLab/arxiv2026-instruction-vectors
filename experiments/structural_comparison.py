@@ -375,6 +375,7 @@ all_model_comparisons = {model: {} for model in models}
 for model in models:
     model_dir = f"{PROJECT_ROOT}/experiments/output/path_analysis/{model}"
 
+    # Make heatmap comparison graphs across k values (bar graph & heatmap)
     tok_info_k1, _, _, _ = mean_activity_rate_per_token(
         k=1, task_pair=task_pair, model_dir=model_dir, samples=samples, num_heads=num_heads, num_layers=num_layers
     )
@@ -404,7 +405,7 @@ for model in models:
             save_path=f"{PROJECT_ROOT}/experiments/output/graphs/heads_{base_task}_{model}_k_correlation.png",
         )
 
-    # Compute and plot bootstrapped confidence intervals
+    # Compute bootstrapped confidence intervals for the head activity heatmap plot
     bootstrap_src_tokens = {task_pair[0]: 8, task_pair[1]: 8}
     for bootstrap_k in [1, 2]:
         bootstrap_results = {
