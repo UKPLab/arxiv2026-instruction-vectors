@@ -145,3 +145,4 @@ arxiv2026_instruction_vectors/sketch*
 # Large files
 experiments/output/patching_scores/*
 experiments/output/path_analysis/*
+experiments/output/graphs

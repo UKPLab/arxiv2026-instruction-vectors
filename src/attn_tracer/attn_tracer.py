@@ -4,29 +4,31 @@ from collections import defaultdict
 import gc
 from tqdm import tqdm
 
-def get_attn_paths(model, prompt, prompt_tokens, start_pos, end_pos=-1):
+def get_attn_paths(model, prompt, prompt_tokens, start_pos, end_pos=-1, k=1):
     seq_len = len(prompt_tokens)
     if end_pos == -1:
         end_pos = seq_len
     num_layers = model.model.config.num_hidden_layers
+
+    print("END POS:", end_pos)
 
     # Forward pass with attention tracking
     with model.trace(prompt, output_attentions=True, return_dict=True) as tr:
         attentions = model.output.attentions.save()
 
     # Extract attention argmax patterns
-    max_jump = [attn[0].argmax(dim=2).cpu() for attn in attentions]
-
+    # topk here
+    max_jump = [attn[0].topk(k=k, dim=2).indices.cpu() for attn in attentions]
     # Build attention graph
     merged_graph = defaultdict(list)
     _tmp = defaultdict(lambda: defaultdict(set))
-
     for L in range(num_layers):
-        Hh, T = max_jump[L].shape
+        Hh, T, K = max_jump[L].shape  
         for h in range(Hh):
             for q in range(T):
-                src_tok = int(max_jump[L][h, q].item())
-                _tmp[(L - 1, src_tok)][q].add(h)
+                for k_idx in range(K):
+                    src_tok = int(max_jump[L][h, q, k_idx].item())
+                    _tmp[(L - 1, src_tok)][q].add(h) 
 
     # Create edge list for each (layer, token) pair
     for source_layer in range(-1, num_layers - 1):
@@ -83,13 +85,12 @@ def get_attn_paths(model, prompt, prompt_tokens, start_pos, end_pos=-1):
         all_paths[s] = enumerate_paths_from(s)
     return all_paths
 
+
 def get_model_for_paths(model, prompt, paths, start_pos=None):
     config = model.model.config
     num_layers = config.num_hidden_layers
     hidden_size = config.hidden_size
     model_type = config.model_type
-
-    #enc = model.tokenizer(prompt, return_tensors="pt")
 
     if start_pos is None:
         start_pos = min(paths.keys()) if paths else 0

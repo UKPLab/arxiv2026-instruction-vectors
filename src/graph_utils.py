@@ -752,7 +752,7 @@ def head_k_correlation_plot(
         ax.set_title(title_str)
         ax.legend(loc="lower right", fontsize=9)
 
-    # ── Row 0: Spearman r per head ────────────────────────────────────────────
+    # Row 0: Spearman r per head
     ax_head = fig.add_subplot(gs[0, :])
     _bar_chart(
         ax_head,
@@ -762,7 +762,7 @@ def head_k_correlation_plot(
         title_str=f"Per-head Spearman r  (k={k1} vs k={k2})",
     )
 
-    # ── Row 1: Spearman r per layer ───────────────────────────────────────────
+    # Row 1: Spearman r per layer
     ax_layer = fig.add_subplot(gs[1, :])
     _bar_chart(
         ax_layer,
@@ -772,7 +772,7 @@ def head_k_correlation_plot(
         title_str=f"Per-layer Spearman r  (k={k1} vs k={k2})",
     )
 
-    # ── Row 2: diff heatmaps per task ─────────────────────────────────────────
+    # Row 2: diff heatmaps per task
     layers = list(range(num_layers))
     reversed_heads = list(reversed(range(num_heads)))
 
