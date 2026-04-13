@@ -17,10 +17,10 @@ torch.set_grad_enabled(False)
 
 from src.attn_tracer import get_attn_paths, get_model_for_paths, compute_path_transformation_vector
 from src.utils import setup_model, get_token_position, print_gpu_tensors
-from src.analysis.show_path_contributions import show_path_contributions
-from src.analysis.plot_path_histogram import plot_path_histogram
-from src.analysis.reduce_to_answer_contribution import reduce_to_answer_contribution
-from src.analysis.filter_paths import filter_paths_by_threshold
+from src.path_analysis.show_path_contributions import show_path_contributions
+from src.path_analysis.plot_path_histogram import plot_path_histogram
+from src.path_analysis.reduce_to_answer_contribution import reduce_to_answer_contribution
+from src.path_analysis.filter_paths import filter_paths_by_threshold
 
 
 # Save token data for graphing
