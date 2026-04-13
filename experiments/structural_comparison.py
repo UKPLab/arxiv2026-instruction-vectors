@@ -15,7 +15,7 @@ from src.graph_utils import (
 from src.latex_utils import comparisons_to_latex
 
 
-def get_head_activity_rate_for_sample(src_token, task_dir, sample_idx, num_heads, num_layers):
+def mean_activity_rate_for_sample(src_token, task_dir, sample_idx, num_heads, num_layers):
     """
     Collect head activity info across all paths for a single sample of a task.
 
@@ -312,7 +312,7 @@ def mean_activity_rate_per_token(k, task_pair, model_dir, samples, num_heads, nu
             contribs_file = f"{token_pos}.pt"
 
             if contribs_file in task_1:
-                heads_info = get_head_activity_rate_for_sample(token_pos, task_dirs[0], sample_idx, num_heads, num_layers)
+                heads_info = mean_activity_rate_for_sample(token_pos, task_dirs[0], sample_idx, num_heads, num_layers)
                 if task_pair[0] in tok_info[token_pos]:
                     for src_layer in tok_info[token_pos][task_pair[0]]:
                         for head in tok_info[token_pos][task_pair[0]][src_layer]:
@@ -327,7 +327,7 @@ def mean_activity_rate_per_token(k, task_pair, model_dir, samples, num_heads, nu
                     }
 
             if contribs_file in task_2:
-                heads_info = get_head_activity_rate_for_sample(token_pos, task_dirs[1], sample_idx, num_heads, num_layers)
+                heads_info = mean_activity_rate_for_sample(token_pos, task_dirs[1], sample_idx, num_heads, num_layers)
                 if task_pair[1] in tok_info[token_pos]:
                     for src_layer in tok_info[token_pos][task_pair[1]]:
                         for head in tok_info[token_pos][task_pair[1]][src_layer]:
