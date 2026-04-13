@@ -21,6 +21,10 @@ def create_parser():
     # Start and end token positions for path tracing
     parser.add_argument('--start_pos', type=int, default=9)
     parser.add_argument('--end_pos', type=int, default=-1)
+    parser.add_argument('--src_token_t1', type=int, default=None)
+    parser.add_argument('--src_token_t2', type=int, default=None)
+    parser.add_argument('--k', type=int, default=None)
+    parser.add_argument('--threshold_rank', type=int, default=100)
 
     # Dataset sample index for path tracing (iteration over samples is done in bash script)
     parser.add_argument('--tracing_sample_idx', type=int, default=0)
