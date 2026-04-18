@@ -10,85 +10,45 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
 
-def graph_inference_scores(scores_df, instr_df, save_path, metric_type, model_names):
-    # Sort models alphabetically (and by size)
-    model_names = sorted(model_names)
-    
-    tasks = scores_df.index
+def graph_inference_scores(scores_df, instr_df, save_path, model_groups):
+    tasks = list(scores_df.index)
+    n_tasks = len(tasks)
+    n_rows = len(model_groups)
 
-    colors = [
-        "#2F00CA",
-        "#968CFF",  
-        "#C72FB5",
-        "#FDD0FF",
-        "#E2CE5B",
-        "#FBDE37",
-        "#CE1039", 
-        "#58EE60",
-        "#45BC96",    
-        "#68EDB3",  
-        "#0055FF",
-        "#9EFAFA",  
-        ]
-    colors = {task:color for task, color in zip(tasks, colors)}
+    task_colors = [
+        "#45BC96", "#68EDB3", "#0055FF", "#9EFAFA",
+        "#2F00CA", "#968CFF", "#C72FB5", "#FDD0FF",
+    ]
+    colors = {task: color for task, color in zip(tasks, task_colors)}
 
-    task_scores_row1 = {task:[] for task in tasks}
-    instr_scores_row1 = {task:[] for task in tasks}
-    model_names_1 = model_names[0:3]
-    task_scores_row2 = {task:[] for task in tasks}
-    instr_scores_row2 = {task:[] for task in tasks}
-    model_names_2 = model_names[3:6]
+    width = 0.8 / n_tasks
+    center_offset = width * n_tasks / 2
 
-    for task in task_scores_row1:
-        for model in model_names_1:
-            task_scores_row1[task].append(scores_df.loc[task, model])
-            instr_scores_row1[task].append(instr_df.loc[task, model])
-    for task in task_scores_row2:
-        for model in model_names_2:
-            task_scores_row2[task].append(scores_df.loc[task, model])
-            instr_scores_row2[task].append(instr_df.loc[task, model])
+    fig, axs = plt.subplots(n_rows, 1, figsize=(10, 3.5 * n_rows), layout="constrained")
+    if n_rows == 1:
+        axs = [axs]
 
-    all_scores = [task_scores_row1, task_scores_row2]
-    all_instr_scores = [instr_scores_row1, instr_scores_row2]
-    all_models = [model_names_1, model_names_2]
+    for ax, chunk in zip(axs, model_groups):
+        x = np.arange(len(chunk))
 
-    fig, axs = plt.subplots(2, 1, figsize=(4, 4), layout="constrained")
+        for task_idx, task in enumerate(tasks):
+            offset = width * task_idx
+            instr_vals = [float(instr_df.loc[task, m]) for m in chunk]
+            basic_vals = [float(scores_df.loc[task, m]) for m in chunk]
+            ax.bar(x + offset, instr_vals, width, color="gainsboro", edgecolor="black", linewidth=0.3)
+            ax.bar(x + offset, basic_vals, width, label=task, color=colors[task], edgecolor="black", linewidth=0.3)
 
-    for idx in range(len(axs)):
-        ax = axs[idx]
-        x = np.arange(len(all_models[idx]))
-        width = 0.18  # bar width
-
-        task_scores = all_scores[idx]
-        instr_scores = all_instr_scores[idx]
-
-        multiplier = 0
-        for task, instr_score in instr_scores.items():
-            offset = width * multiplier
-            instr_rects = ax.bar(x + offset, instr_score, width, label=task, color="gainsboro", edgecolor="black", linewidth=0.3)
-            multiplier += 1
-
-        multiplier = 0
-        for task, score in task_scores.items():
-            offset = width * multiplier
-            rects = ax.bar(x + offset, score, width, label=task, color=colors[task], edgecolor="black", linewidth=0.3)
-            multiplier += 1
-
-        shortened_names = [name.replace("instruct", "it") for name in all_models[idx]]
-
+        shortened = [m.replace("instruct", "it") for m in chunk]
         ax.axhline(y=50, color="gray", linestyle="dashed")
-        
-        ax.set_xticks(x + 0.3, shortened_names)
+        ax.set_xticks(x + center_offset, shortened)
         ax.set_ylim(0, 100)
-        ax.yaxis.grid(True, linestyle='--', which='major', color='grey', alpha=.25)
+        ax.yaxis.grid(True, linestyle="--", which="major", color="grey", alpha=0.25)
         ax.set_yticks([0, 20, 40, 60, 80])
         ax.yaxis.minorticks_on()
 
-    # The axes share a legend
+    # Grab only the colored (basic accuracy) bar handles — one per task
     handles, labels = axs[0].get_legend_handles_labels()
-    print(handles)
-    print(labels)
-    fig.legend(handles[-4:], labels[-4:], loc='outside lower center', ncols=2)
+    fig.legend(handles[-n_tasks:], labels[-n_tasks:], loc="outside lower center", ncols=2)
     plt.savefig(save_path, dpi=200)
     return
 
@@ -158,9 +118,20 @@ def make_mlp_heatmap(model_scores,
     images = []
     for row_idx in range(values_matrices.shape[0]):
         for col_idx in range(values_matrices.shape[1]):
-            img = axs[row_idx, col_idx].imshow(values_matrices[row_idx, col_idx], cmap=cmap, norm=norm)
+            img = axs[row_idx, col_idx].imshow(
+                values_matrices[row_idx, col_idx], 
+                cmap=cmap, 
+                #norm=norm,
+            )
             images.append(img)
-            fig.colorbar(img, ax=axs[row_idx, col_idx], location='right', fraction=0.046, pad=0.04, norm=norm)
+            fig.colorbar(
+                img, 
+                ax=axs[row_idx, col_idx], 
+                location='right', 
+                fraction=0.046, 
+                pad=0.04, 
+                #norm=norm,
+            )
 
     # Plot the data on a 16x16 (or 32x32 for 7B) grid
     for ax in axs.flat:
@@ -531,9 +502,7 @@ def active_heads_heatmap(
 
 
 def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title, save_path,
-                             token_positions=None,
-                             interesting_pvalue_threshold=0.05,
-                             interesting_boundary_margin=0.1):
+                             token_positions=None):
     """
     Plot mean head activity (and optionally 95% CI width) for both tasks in task_pair.
 
@@ -590,35 +559,17 @@ def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title,
                 else:
                     mean_mat[layer, head_idx] = val or 0.0
                     
-        # Interesting heads: p near 0 but mean_rate not near the 0/1 boundary
-        # (boundary-proximate heads produce p≈0 as a test artifact, not signal)
-        interesting_mask = (
-            (pvalue_mat < interesting_pvalue_threshold) &
-            (mean_mat > interesting_boundary_margin) &
-            (mean_mat < 1 - interesting_boundary_margin)
-        )
         # Reverse head axis to match existing heatmap convention
         matrices[task] = {
-            "mean":      np.flip(mean_mat, axis=1),
-            "ci_width":  np.flip(ci_width_mat, axis=1),
-            "pvalue":    np.flip(pvalue_mat, axis=1),
-            "interesting": np.flip(interesting_mask, axis=1),
+            "mean":     np.flip(mean_mat, axis=1),
+            "ci_width": np.flip(ci_width_mat, axis=1),
+            "pvalue":   np.flip(pvalue_mat, axis=1),
         }
         ci_max = max(ci_max, matrices[task]["ci_width"].max())
-
-    legend_label = f"★ p<{interesting_pvalue_threshold}, mean ∈ ({interesting_boundary_margin}, {1 - interesting_boundary_margin})"
-
-    def _overlay_interesting(ax, task, show_legend):
-        ys, xs = np.where(matrices[task]["interesting"])
-        ax.scatter(xs, ys, marker="*", s=80, color="cyan", zorder=5, linewidths=0,
-                   label=legend_label)
-        if show_legend and ys.size > 0:
-            ax.legend(loc="upper right", fontsize=7, framealpha=0.7)
 
     for col_idx, task in enumerate(task_pair):
         tok_label = f" (token_pos={token_positions[task]})" if token_positions else ""
         row = 0
-        show_legend = (col_idx == 0)  # only label once, on the left column
 
         im_mean = axs[row, col_idx].imshow(
             matrices[task]["mean"],
@@ -626,8 +577,6 @@ def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title,
             norm=mpl.colors.Normalize(vmin=0, vmax=1),
         )
         fig.colorbar(im_mean, ax=axs[row, col_idx], fraction=0.046, pad=0.04)
-        if has_pvalue:
-            _overlay_interesting(axs[row, col_idx], task, show_legend)
         axs[row, col_idx].set_title(f"{task}{tok_label}\nMean activity")
 
         if has_ci:
@@ -638,8 +587,6 @@ def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title,
                 norm=mpl.colors.Normalize(vmin=0, vmax=ci_max or 1),
             )
             fig.colorbar(im_ci, ax=axs[row, col_idx], fraction=0.046, pad=0.04)
-            if has_pvalue:
-                _overlay_interesting(axs[row, col_idx], task, False)
             axs[row, col_idx].set_title(f"{task}{tok_label}\n95% CI width (uncertainty)")
 
         if has_pvalue:
@@ -651,8 +598,7 @@ def head_activity_ci_heatmap(task_info, task_pair, num_heads, num_layers, title,
                 norm=mpl.colors.Normalize(vmin=0, vmax=np.nanmax(pv) or 1),
             )
             fig.colorbar(im_pv, ax=axs[row, col_idx], fraction=0.046, pad=0.04)
-            _overlay_interesting(axs[row, col_idx], task, False)
-            axs[row, col_idx].set_title(f"{task}{tok_label}\np-value: variance vs noise")
+            axs[row, col_idx].set_title(f"{task}{tok_label}\np-value (t-test vs 0.5)")
 
     for ax in axs.flat:
         ax.set_yticks(range(num_layers), labels=layers)
